@@ -287,6 +287,9 @@ SIEM/EDR vendors — each has tailored guidance here (kept exactly as in your ve
 # Attribution
 
 **Project:** Phantom Armor (synthetic cybersecurity log simulator)
+
 **Author:** Greg Rothman
+
 **Contact:** **[gregralr@phantomarmor.com](mailto:gregralr@phantomarmor.com)**
+
 **Note:** All data and scenarios are fully synthetic. No real users, systems, or organizations are represented.
