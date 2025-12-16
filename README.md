@@ -1,295 +1,460 @@
-# cyber_simulation
+# Enterprise Attack Simulator
 
-Synthetic cybersecurity log simulator for research, SOC automation testing, and machine learning benchmarking
-
-## About This Project
-
-**Phantom Armor Synthetic Log Simulator** is an open research effort designed to help the security community evaluate detection and SOC automation systems on realistic, labeled, but fully synthetic data.
-
-The dataset is **free for research and benchmarking**. Commercial or production use requires permission.
-
-# Enterprise Security Log Dataset with Embedded MITRE ATT&CK Chain
-
-A fully labeled, synthetic enterprise log dataset with a realistic, multi-stage MITRE ATT&CK chain embedded in normal user, service-account, and infrastructure activity.
+**AI-Powered Synthetic Security Log Dataset for Detection Engineering**
 
 ---
 
-# WHAT THIS REPO IS
+## What This Is
 
-* **Synthetic enterprise environment** spanning 9 days of activity (Nov 16–24, 2025)
-* **Realistic security log dataset** with host + network events:
+A **realistic enterprise security log dataset** featuring:
+- **8+ million enterprise logs** with realistic background noise
+- **Full APT attack campaign** spanning 23 days
+- **55+ service accounts** with authentic activity patterns
+- **500 users** across 10 departments with role-based behavior
+- **Defense product logs** (EDR, DLP, SIEM, PAM, MFA) that react to attacks
+- **Labeled ground truth** for every attack action
 
-  * Normal user behavior across 500+ employees
-  * Background infrastructure & 50+ service accounts
-  * One labeled, multi-stage APT attack chain with ground-truth labels
-* **ML research platform** for:
-
-  * User and Entity Behavior Analytics (UEBA)
-  * Anomaly detection & sequence modeling
-  * Attack kill chain reconstruction
-  * Role-based behavioral profiling
-* **Detection evaluation framework** for:
-
-  * SIEM/EDR rule testing
-  * MITRE ATT&CK coverage validation
-  * False positive rate benchmarking
-* **File-hash and reputation telemetry** for:
-
-  * sha256 / md5 hashes on selected events
-  * Realistic file_size, signed flag, prevalence_score per file
-* **Educational resource** for:
-
-  * SOC analyst training
-  * Cybersecurity curriculum
-  * Threat research
-
-# WHAT THIS REPO IS NOT
-
-* Not real customer or production data (fully synthetic)
-* Not an open-source log generator (curated dataset only)
-* Not affiliated with any employer or vendor
-* Not a full benchmark suite (sample scenario)
+Built by an ML engineer working in cybersecurity who encountered a common challenge: limited access to realistic, labeled security data for training and testing detection systems.
 
 ---
 
-# REPOSITORY CONTENTS
+## Background & Motivation
+
+Security teams face a data challenge:
+
+**Training detection systems** requires labeled attack data, but real breaches are rare, sensitive, and can't be freely shared. Most teams resort to:
+- Static datasets from years ago (DARPA 2000, CICIDS)
+- Lab exercises with clean, compressed attack scenarios
+- Limited red team engagements that can't run continuously
+
+**Validating detections** is difficult without realistic test data that mirrors actual enterprise environments—complete with background noise, service account activity, and the tool overlap that makes real attacks hard to detect.
+
+**Practicing investigations** on simplified lab data doesn't prepare analysts for the challenges of finding attacks buried in millions of enterprise logs.
+
+This dataset aims to address these gaps by providing:
+- Realistic enterprise-scale logs (8M+ events)
+- Labeled attack data embedded in normal activity
+- Service account behavior and legitimate lateral movement
+- Defense product responses (EDR, DLP, SIEM)
+- Multi-week attack timelines
+
+This is one approach to the training data problem—there are certainly others—and is offered as a research resource for the community.
+
+---
+
+## Sample Dataset Characteristics
+
+### Living Off The Land Attack (Intermediate Skill)
+
+**Attack Profile:**
+- **Attacker:** joseph.wilson475 (Security Analyst, blends with normal activity)
+- **Campaign:** 23 days (Dec 16 - Jan 7, 2026)
+- **Techniques:** PowerShell to Domain Discovery to RDP to Exfiltration
+- **Service accounts hijacked:** svc_database, svc_backup, svc_adconnect, svc_fileserver
+
+**Dataset Stats:**
+- **Total logs:** 8,108,152
+- **Attack logs:** 570 (0.007% - realistic signal-to-noise)
+- **Defense alerts:** 209 (37% detection rate)
+- **Users:** 500 across 10 departments
+- **Service accounts:** 55 generating background activity
+- **Timeline:** 25 days of continuous enterprise activity
+
+**Attack Buried in Noise:**
+```
+joseph.wilson475 (compromised user):
+├─ Benign logs: 2,718 (88%)
+└─ Attack logs: 361 (12%)
+
+svc_database (hijacked service account):
+├─ Benign logs: 185,254 (99.97%)
+└─ Attack logs: 64 (0.03%)
+```
+
+**Defense Response:**
+```
+Defender ATP alerts: 71
+DLP blocks: 52
+SIEM correlation: 14
+Credential monitoring: 11
+PAM denials: 6
+MFA failures: 4
+Lateral movement alerts: 3
+```
+
+---
+
+## What Makes This Dataset Different
+
+### 1. **Realistic Attack Timelines**
+Not compressed lab scenarios, actual APT behavior:
+- **Script kiddie:** 7 days (rapid, noisy)
+- **Intermediate:** 21-35 days (patient, learning)
+- **Advanced:** 60+ days (months-long dwell time)
+
+This dataset: **23 days** (intermediate skill level)
+
+### 2. **Service Account Realism**
+55+ service accounts generating millions of background logs:
+```
+svc_edr_agent: 951K logs (endpoint monitoring)
+svc_siem_collector: 935K logs (log collection)
+svc_database: 185K logs (includes 64 attack logs, 0.034% signal)
+svc_backup: 27K logs (includes 61 attack logs,  0.22% signal)
+```
+
+Attack logs are **buried in realistic enterprise noise** - just like real breaches.
+
+### 3. **Defense Product Logs**
+Unlike static datasets, this includes realistic defense responses:
+- **Endpoint protection:** EDR alerts, blocks, and detections
+- **Access control:** PAM denials, MFA challenges, NAC quarantine
+- **Security monitoring:** SIEM correlation, behavioral detection
+- **Network security:** DLP blocks, proxy filtering, lateral movement alerts
+
+**Detection rate:** 37% (realistic for intermediate-skill attacker)
+
+### 4. **Legitimate Lateral Movement**
+Shows both legitimate and malicious service account usage:
+- Finance users accessing databases (Tableau, PowerBI)
+- IT admins performing maintenance
+- Attackers hijacking service accounts
+
+This is the **real detection challenge**: distinguishing malicious from legitimate.
+
+---
+
+## Potential Use Cases
+
+This dataset was created with several use cases in mind:
+
+### **Training ML Detection Models**
+- Labeled ground truth for supervised learning
+- Realistic signal-to-noise ratio (0.007% attack signal)
+- Service account and user behavior baselines
+- Defense product logs as additional features
+
+### **Validating Detection Logic**
+- Test whether your rules detect this intermediate-skill attack
+- Identify which stages evade detection (37% detection rate in this data)
+- Understand false positive rates in realistic noise
+
+### **SOC Analyst Training**
+- Practice investigating multi-week campaigns
+- Learn to distinguish legitimate from malicious lateral movement
+- Navigate enterprise-scale log volumes
+
+### **Research & Education**
+- Study APT behavior patterns over realistic timelines
+- Analyze service account hijacking techniques
+- Understand defense product effectiveness
+
+**Note:** This is a **static dataset** generated from a simulation framework. The full simulation capability (custom defense configurations, different attack chains, varying skill levels) is part of ongoing research work. This dataset represents one specific scenario: a 23-day intermediate-skill living-off-the-land attack.
+
+---
+
+## Repository Contents
 
 ```
 ├── data/
-│   └── enterprise_logs_sample.csv          Full dataset (2,901,947 events)
+│   └── two_day_sample.csv.gz       # 26MB compressed sample (2 days, included in repo)
 ├── notebooks/
-│   ├── 1explore_dataset.ipynb              Schema, distributions, user profiles
+│   └── explore_dataset.ipynb       # Dataset overview, distributions   
 ├── docs/
-│   ├── schema.md                           Complete field documentation
-└── README.md                               This file
+│   └── SCHEMA.md                   # Complete field documentation  
+└── README.md
 ```
 
 ---
 
-# Download & Prepare the Dataset
+## Quick Start
 
-The full dataset is hosted in Google Cloud Storage as a ZIP file.
-
-### Option 1 – Using gcloud (recommended)
-
-From the root of this repo:
+### Download Dataset
 
 ```bash
 cd /path/to/cyber_simulation
 
 mkdir -p data
 
-# Download ZIP from GCS
-gcloud storage cp \
-  gs://phantom-armor-datasets/cyber_simulation/v1/enterprise_logs_sample.zip \
-  data/enterprise_logs_sample.zip
+#297 mb compressed
+curl -o data/simulation.csv.gz \
+   https://huggingface.co/datasets/gregalr/cyber_simulation/resolve/main/simulation.csv.gz
 
-# Unzip
-unzip data/enterprise_logs_sample.zip -d data
-
-# Optional: delete ZIP
-rm data/enterprise_logs_sample.zip
-```
-
-You should now have:
+# Load in Python
+import pandas as pd
+df = pd.read_csv('data/simulation.csv.gz')  # Pandas handles gzip
 
 ```
-data/enterprise_logs_sample.csv
+
+### Explore Tiny Sample (No Download)
+
+```python
+import pandas as pd
+
+# Load included sample (25MB, 2 days)
+df = pd.read_csv('data/two_day_sample.csv.gz')
+
+# Filter to attack logs
+attack = df[df['attack_id'].notna()]
+print(f"Attack logs: {len(attack)}")
+print(f"Techniques: {attack['attack_type'].unique()}")
+
+# See defense response
+defense_logs = df[~df['log_type'].str.startswith('windows', na=False)]
+print(f"Defense alerts: {len(defense_logs)}")
 ```
 
 ---
 
-### Option 2 – Using curl (no gcloud required)
+## Schema Overview
 
-```bash
-cd /path/to/cyber_simulation
-
-mkdir -p data
-
-curl -o data/enterprise_logs_sample.zip \
-  https://storage.googleapis.com/phantom-armor-datasets/cyber_simulation/v1/enterprise_logs_sample.zip
-
-unzip data/enterprise_logs_sample.zip -d data
-
-rm data/enterprise_logs_sample.zip
+### Core Fields
+```
+timestamp          - ISO 8601: "2025-12-16 01:32:03"
+log_type           - "windows_security_event", "defender_atp_alert", etc.
+user               - Human identity: "joseph.wilson475"
+account            - Security principal (user or svc_*)
+hostname           - Device: "WS-SEC-0476", "DB-SRV-01"
+device_type        - workstation, database_server, domain_controller
+location           - NYC_HQ, SF_Office, London, Remote_VPN
+department         - Security, Finance, Engineering, etc
 ```
 
-Output:
+### Activity Fields
+```
+process_name       - "powershell.exe", "net.exe"
+command_line       - Full command with arguments
+event_type         - process_start, network_connection, file_access
+source_ip          - Internal: 10.x.x.x, VPN: 192.168.x.x
+destination_ip     - Internal or external C2
+port               - 135, 443, 3389, etc
+protocol           - TCP, UDP, HTTPS, RDP
+```
+
+### Attack Labels
+```
+attack_id          - "ATK_84073" or null
+attack_type        - "t1059.001" (MITRE technique) or null
+stage_number       - "0" through "15" or null
+```
+
+### Defense Logs (30+ types)
+```
+log_type           - "defender_atp_alert", "dlp_block", "siem_alert"
+severity           - low, medium, high, critical
+action_taken       - blocked, logged, quarantined, denied
+vendor             - Defende Product vendor
+detection_confidence - 0.0-1.0
+alert_name         - "Suspicious PowerShell Activity"
+reason             - "Malicious script pattern detected"
+```
+
+See `docs/SCHEMA.md` for complete documentation including all defense fields.
+
+---
+
+## Attack Chain: living_off_land_basic
+
+**Threat Actors:** APT29, Cozy Bear, The Dukes  
+**Description:** PowerShell-based attack using legitimate tools  
+**Flow:** PowerShell execution to Domain discovery to RDP lateral movement to Data exfiltration
+
+### Stage Breakdown
+
+**Stages 0-3: PowerShell Execution (t1059.001)**
+```
+Dec 16: Initial access attempts (multiple failures)
+- powershell.exe -ExecutionPolicy Bypass
+- Blocked by: AMSI, AppLocker, Defender
+- Attacker learns environment defenses
+```
+
+**Stages 4-6: Domain Discovery (t1087.002)**
+```
+Dec 17-19: Reconnaissance
+- net user, whoami, systeminfo
+- Get-ADUser, Get-ADGroupMember
+- Identifies service accounts and admin groups
+```
+
+**Stages 7-10: Lateral Movement (t1021.001)**
+```
+Dec 23-31: RDP to servers
+- mstsc.exe to DB-SRV-01
+- Hijacks svc_database account
+- Moves to svc_backup, svc_adconnect
+```
+
+**Stages 11-15: Exfiltration (t1041)**
+```
+Jan 2-7: Data theft
+- Compress-Archive sensitive files
+- Exfil via svc_database permissions
+- Multi-stage data transfer
+```
+
+---
+
+## Why This Attack Is Hard to Detect
+
+1. **Security analyst tools overlap with attacker tools**  
+   PowerShell, net.exe, RDP - all used legitimately by Security dept
+
+2. **Service account activity provides perfect cover**  
+   svc_database generates 185K logs - 64 attack logs blend in (0.03%)
+
+3. **Multi-week dwell time avoids spike detection**  
+   23-day campaign - no sudden anomaly, gradual progression
+
+4. **Legitimate credentials bypass many controls**  
+   Hijacked service accounts have authorized access
+
+5. **Living-off-land techniques**  
+   No malware, only built-in Windows tools
+
+---
+
+## Dataset Statistics
 
 ```
-data/enterprise_logs_sample.csv
+Total logs:        8,108,152
+Attack logs:       570 (0.007%)
+Defense alerts:    209 (37% detection rate)
+Users:             500
+Service accounts:  55
+Devices:           1,024
+Locations:         4 (NYC, SF, London, Remote VPN)
+Duration:          25 days
+Attack stages:     16
+MITRE techniques:  4
 ```
 
-The notebook and any code in this repo assume the dataset is located at that path.
+---
+
+## How This Dataset Differs
+
+This dataset was created to address a specific gap: **realistic, labeled training data at enterprise scale**. Here's how it compares to other common resources:
+
+### Static Attack Datasets
+Examples: DARPA 2000, CICIDS, KDD Cup
+
+**Similarities:** Labeled ground truth, repeatable scenarios  
+**Differences:** Multi-week timelines, service account noise, defense product logs  
+**Tradeoff:** Single attack scenario vs. diverse attack types  
+
+### Live Testing Platforms
+Examples: Commercial breach & attack simulation platforms
+
+**Different purpose:** Those validate deployed controls; this provides training data  
+**Complementary:** Use those to test, use this to train  
+**Tradeoff:** Not testing real systems, purely synthetic  
+
+### Interactive Training Environments
+Examples: Cyber ranges, virtual labs, CTF platforms
+
+**Similarities:** Controlled, repeatable scenarios  
+**Differences:** Enterprise-scale noise (8M logs), realistic service account activity  
+**Tradeoff:** Can't interact with attack in real-time  
+
+### Real Breach Data
+
+**Nothing replaces this:** Real incidents provide ground truth  
+**This is useful when:** Real data is unavailable, sensitive, or can't be shared  
+**Tradeoff:** Synthetic doesn't capture all real-world complexity  
 
 ---
 
-# SCENARIO OVERVIEW
-
-## Environment
-
-500 users across Engineering, Finance, Security, Sales, HR, Legal, Operations, Support
-Locations: NYC_HQ, SF_Office, London, Remote_VPN
-
-### Infrastructure
-
-* Workstations (~500), mobile devices (~400)
-* Servers: Database (6), Web (8), Application (6), Domain Controllers (3)
-* Security: SIEM (2), Monitoring (2), Email Security (2), Firewalls (3)
-* Infrastructure: File servers, SharePoint, Backup, Print servers
-
-### Service Accounts
-
-50+ service accounts (svc_backup, svc_monitoring, svc_adconnect, etc.)
+**Bottom line:** This dataset is not a replacement for any of these—it's another tool in the toolkit, useful when you need labeled, repeatable, shareable data at enterprise scale.
 
 ---
 
-## Dataset Coverage
+## Dataset Scope
 
-* Timespan: 9 days (Nov 16–24, 2025)
-* Total events: ~2.9M
-* Attack ratio: <1%
-* Composition: normal workflows + infrastructure noise + multi-day APT intrusion
+This release focuses on one well-developed scenario to provide depth and realism:
 
----
+**Attack Profile:**
+- Campaign: 23-day living-off-the-land attack
+- Skill level: Intermediate (realistic failure rates, learning behavior)
+- Environment: Enterprise on-premises (Active Directory, Windows)
+- Scale: 8.1M logs across 500 users and 55 service accounts
 
-## Embedded Attack
+**Defense Configuration:**
+- EDR: Microsoft Defender ATP
+- Access control: PAM, MFA, NAC
+- Network security: DLP, proxy filtering
+- Monitoring: SIEM correlation, behavioral detection
+- Detection rate: 37% (realistic for this attacker skill level)
 
-* Attack ID: ATK_63070
-* Victim: **linda.davis381** (Security Analyst)
-* Duration: 5 days
-* Kill chain stages: 16
-* MITRE techniques:
+**Design Choice:**
+We focused on one scenario executed at high fidelity rather than many scenarios with less depth. This allows for detailed analysis of attack progression, defense response patterns, and the challenges of detecting sophisticated attacks in realistic enterprise noise.
 
-  * t1059.001 – PowerShell
-  * t1087.002 – Domain Discovery
-  * t1021.001 – RDP Lateral Movement
-  * t1041 – Exfiltration
-* Privilege escalation: user → svc_adconnect
-* Targets: DC-01, DC-02
-* C2: 203.0.113.70 (ports 8080, 443, 9090)
+The dataset is static and synthetic, representing a single attack campaign. This makes it repeatable, shareable, and suitable for training and research.
 
 ---
 
-# SCHEMA OVERVIEW
+## Why Realistic Timelines Matter
 
-## Core Identifiers
+**Compressed approach (most datasets):**
+```
+Hour 1: Initial access
+Hour 2: Lateral movement
+Hour 3: Exfiltration
+→ Unrealistic, easy to detect
+```
 
-timestamp, user, account, service_account, hostname, device_type, location, network_membership
+**Realistic approach (this dataset):**
+```
+Week 1: Initial access (learning defenses)
+Week 2: Reconnaissance (patient enumeration)
+Week 3: Lateral movement (slow pivot)
+Week 4: Exfiltration (final push)
+→ Mirrors real APT behavior
+```
 
-## User Context
-
-department, role, task_category
-
-## Process & Activity
-
-process_name, parent_process, command_line, event_type
-
-## Network Fields
-
-source_ip, destination_ip, port, protocol
-
-## Attack Labels
-
-attack_id, attack_type, stage_number
-
-## Session Fields
-
-session_id
-
-## File Hash & Reputation Fields
-
-Present **only on events where hashing is triggered** (process/file/network):
-
-* **sha256** – 64-char SHA-256
-* **md5** – 32-char MD5
-* **file_size** – realistic estimated size
-* **signed** – `"true"` or `"false"`
-* **prevalence_score** – how common the hash is (0.0–1.0)
+**Real-world validation:**
+- Mandiant M-Trends: Average dwell time 16-21 days (intermediate attackers)
+- FireEye: Advanced attackers → 60-90 days
+- This dataset: 23 days for intermediate = realistic
 
 ---
 
-# EMBEDDED ATTACK: ATK_63070 KILL CHAIN
+## License & Attribution
 
-## Attack Profile
+**For Research & Education:** Free to use  
+**For Commercial Use:** Contact for licensing
 
-Security Analyst compromised
-Living-off-the-land
-Service account abuse
-Slow, multi-day discovery + lateral movement + exfiltration
+**Project:** Phantom Armor - Enterprise Attack Simulator  
+**Author:** Greg Rothman  
+**Contact:** gregralr@phantomarmor.com  
 
-### Stages 0–3: Initial Access (t1059.001)
-
-PowerShell bypass, hidden window, reconnaissance, privilege escalation.
-
-### Stages 4–6: Discovery (t1087.002)
-
-AD enumeration, privilege mapping.
-
-### Stages 7–10: Lateral Movement (t1021.001)
-
-RDP to domain controllers, remote PowerShell.
-
-### Stages 11–15: Exfiltration (t1041)
-
-PowerShell, certutil, curl over ports 8080 / 443 / 9090.
+**Note:** All data is fully synthetic. No real users, systems, or organizations are represented.
 
 ---
 
-# Why This Attack Is Hard to Detect
+## Citation
 
-1. Legitimate admin tools overlap heavily with attacker tooling
-2. Security analysts routinely use PowerShell/net/mstsc
-3. Service accounts look normal even when abused
-4. Multi-day dwell time avoids spikes
-5. Domain controller access appears legitimate
+If you use this dataset in your research, please cite:
 
----
-
-# EXAMPLE ML TASKS
-
-**Event-level detection**, **session compromise detection**, **user compromise**,
-**MITRE classification**, **stage prediction**, **sequence modeling**, etc.
-
----
-
-# KEY DETECTION INSIGHTS
-
-* Role-based modeling is required
-* Temporal + sequential context required
-* Service account misuse must be detected manually
-* Multi-port C2 exfiltration resembles normal traffic
+```bibtex
+@dataset{phantom_armor_2025,
+  author = {Rothman, Greg},
+  title = {Enterprise Attack Simulator: AI-Powered Synthetic Security Log Dataset},
+  year = {2025},
+  publisher = {Phantom Armor},
+  url = {https://github.com/gregdiy/cyber_simulation}
+}
+```
 
 ---
 
-# NEXT STEPS
+## Community
 
-ML engineers, threat researchers, SOC analysts, academics, SOC automation teams,
-SIEM/EDR vendors — each has tailored guidance here (kept exactly as in your version).
-
----
-
-# DATASET STATISTICS
-
-* 2,901,947 total events
-* 93 attack events
-* <1% attack ratio
-* 500+ users
-* 50+ service accounts
-* 1024 devices
-* 4 locations
-* 9 days
-* 16 kill chain stages
-* 4 MITRE techniques
+**Issues:** Report bugs or request features via GitHub Issues  
+**Discussions:** Share detection techniques, ask questions  
+**Contributions:** PRs welcome for notebooks, analysis scripts  
 
 ---
 
-# Attribution
+## Acknowledgments
 
-**Project:** Phantom Armor (synthetic cybersecurity log simulator)
-
-**Author:** Greg Rothman
-
-**Contact:** **[gregralr@phantomarmor.com](mailto:gregralr@phantomarmor.com)**
-
-**Note:** All data and scenarios are fully synthetic. No real users, systems, or organizations are represented.
+This work was motivated by real-world challenges encountered while building ML-based detection systems in enterprise security operations. Special thanks to the cybersecurity research community for publicly available threat intelligence and attack documentation that informed the attack modeling.
