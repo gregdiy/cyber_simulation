@@ -32,8 +32,6 @@ Logs are categorized by `log_type` field:
 
 ### Defense Product Logs  
 - `defender_atp_alert` — Microsoft Defender ATP alerts
-- `crowdstrike_telemetry` — CrowdStrike Falcon observability
-- `sentinelone_detection` — SentinelOne behavioral detections
 - `dlp_alert` / `dlp_block` — Data Loss Prevention
 - `siem_alert` — SIEM correlation events
 - `pam_access_denied` — Privileged Access Management
@@ -102,21 +100,18 @@ These fields appear **only in defense product logs** (when `log_type` is NOT `wi
 
 ## Target Information
 
-| Field  | Type   | Required    | Description                                          |
-| ------ | ------ | ----------- | ---------------------------------------------------- |
+| Field  | Type   | Required    | Description                                            |
+| ------ | ------ | ----------- | ------------------------------------------------------ |
 | target | string | conditional | What was targeted: `"lsass.exe"`, `"Credential Store"` |
 
 **Usage:** Indicates the asset/resource that was targeted by suspicious activity.
 
 ## Vendor Information
 
-| Field            | Type   | Required    | Description                                    |
-| ---------------- | ------ | ----------- | ---------------------------------------------- |
-| vendor           | string | conditional | `"CrowdStrike"`, `"Microsoft Defender"`, etc   |
-| sensor_id        | int    | conditional | CrowdStrike sensor identifier                  |
-| investigation_id | int    | conditional | Microsoft Defender investigation ID            |
-| storyline_id     | string | conditional | SentinelOne storyline (attack chain) ID        |
-| reputation_score | int    | conditional | Carbon Black file reputation (0-100)           |
+| Field            | Type   | Required    | Description                                           |
+| ---------------- | ------ | ----------- | ------------------------------------------------------|
+| vendor           | string | conditional | Defense product vendor (e.g., `"Microsoft Defender"`) |
+| investigation_id | int    | conditional | Microsoft Defender investigation ID                   |
 
 **Usage:** Vendor-specific identifiers for correlation and investigation.
 
@@ -218,12 +213,6 @@ Defense logs use specialized event types but may also reference original Windows
 ## EDR Products
 - `defender_atp_alert` — Microsoft Defender ATP alerts
 - `defender_atp_detection` — Defender blocks/quarantines
-- `crowdstrike_telemetry` — CrowdStrike observability
-- `crowdstrike_detection` — CrowdStrike blocks
-- `sentinelone_deep_visibility` — SentinelOne observability
-- `sentinelone_detection` — SentinelOne blocks
-- `carbonblack_event` — Carbon Black observability
-- `carbonblack_detection` — Carbon Black blocks
 
 ## Endpoint Protection
 - `amsi_detection` — Anti-Malware Scan Interface blocks
@@ -610,10 +599,11 @@ Defense products trigger probabilistically (not 100%)
 Errors are realistic Windows errors (90% generic, 10% specific)  
 Multi-week attack timeline matches APT behavior  
 
-## Limitations
+## Scope
 - Fully synthetic (no real user PII or company data)
 - Single attack chain (living_off_land_basic)
-- One skill level (intermediate)
-- One defense configuration (represents common enterprise stack)
+- One skill level (intermediate attacker)
+- One EDR vendor (Microsoft Defender ATP)
+- Single defense configuration (Microsoft-based enterprise stack)
 
 ---
