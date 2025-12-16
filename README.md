@@ -157,13 +157,11 @@ This dataset was created with several use cases in mind:
 
 ```
 ├── data/
-│   └── download_dataset.sh          # Script to download full dataset
-├── samples/
-│   └── tiny_sample.csv              # 10MB sample (3 days, included in repo)
+│   └── two_day_sample.csv.gz       # 26MB compressed sample (2 days, included in repo)
 ├── notebooks/
-│   └── 01explore_dataset.ipynb     # Dataset overview, distributions   
+│   └── explore_dataset.ipynb       # Dataset overview, distributions   
 ├── docs/
-│   └── SCHEMA.md                    # Complete field documentation
+│   └── SCHEMA.md                   # Complete field documentation
 │   
 └── README.md
 ```
@@ -175,16 +173,18 @@ This dataset was created with several use cases in mind:
 ### Download Dataset
 
 ```bash
-# Clone repo
-git clone https://github.com/gregdiy/cyber_simulation
-cd cyber_simulation
+cd /path/to/cyber_simulation
 
-# Download full dataset (~250MB compressed → 2.8GB uncompressed)
-./scripts/download_dataset.sh
+mkdir -p data
+
+#297 mb compressed
+curl -o data/simulation.csv.gz \
+   https://huggingface.co/datasets/gregalr/cyber_simulation/resolve/main/simulation.csv.gz
 
 # Load in Python
 import pandas as pd
-df = pd.read_csv('data/enterprise_attack_23days.csv.gz')  # Pandas handles gzip
+df = pd.read_csv('data/simulation.csv.gz')  # Pandas handles gzip
+
 ```
 
 ### Explore Tiny Sample (No Download)
@@ -192,8 +192,8 @@ df = pd.read_csv('data/enterprise_attack_23days.csv.gz')  # Pandas handles gzip
 ```python
 import pandas as pd
 
-# Load included sample (10MB, 3 days)
-df = pd.read_csv('samples/tiny_sample.csv')
+# Load included sample (25MB, 2 days)
+df = pd.read_csv('data/two_day_sample.csv.gz')
 
 # Filter to attack logs
 attack = df[df['attack_id'].notna()]
