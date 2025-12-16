@@ -182,7 +182,7 @@ curl -L -o data/simulation.csv.gz \
 
 # Load in Python
 import pandas as pd
-df = pd.read_csv('data/simulation.csv.gz')  # Pandas handles gzip
+df = pd.read_csv('data/simulation.csv.gz', sep="\t")  # Pandas handles gzip
 
 ```
 
@@ -192,7 +192,7 @@ df = pd.read_csv('data/simulation.csv.gz')  # Pandas handles gzip
 import pandas as pd
 
 # Load included sample (25MB, 2 days)
-df = pd.read_csv('data/two_day_sample.csv.gz')
+df = pd.read_csv('data/two_day_sample.csv.gz',sep="\t")
 
 # Filter to attack logs
 attack = df[df['attack_id'].notna()]
