@@ -177,7 +177,7 @@ cd /path/to/cyber_simulation
 mkdir -p data
 
 #297 mb compressed
-curl -o data/simulation.csv.gz \
+curl -L -o data/simulation.csv.gz \
    https://huggingface.co/datasets/gregalr/cyber_simulation/resolve/main/simulation.csv.gz
 
 # Load in Python
