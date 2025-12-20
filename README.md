@@ -164,14 +164,13 @@ This dataset was created with several use cases in mind:
 ├── notebooks/
 │   └── explore_dataset.ipynb           # Dataset analysis and examples
 ├── docs/
-│   ├── SCHEMA.md                       # Complete field documentation
-│   └── COMPARISON.md                   # Comparison with other datasets
+│   └── SCHEMA.md                       # Complete field documentation  
 └── README.md
 ```
 
 **Full Datasets (External):**
 - **CSV Format (HuggingFace):** 297MB compressed, single file
-- **JSON Format (HuggingFace):** 297MB compressed, 25 files by day
+- **JSON Format (HuggingFace):** 361MB compressed, 25 files by day
 
 ---
 
@@ -253,25 +252,6 @@ df_day1 = pd.read_json('data/2025-12-14.json', lines=True)
 import glob
 all_files = glob.glob('day_*.json')
 df_full = pd.concat([pd.read_json(f, lines=True) for f in all_files], ignore_index=True)
-```
-
-
-### Explore Tiny Sample (No Download)
-
-```python
-import pandas as pd
-
-# Load included sample (25MB, 2 days)
-df = pd.read_csv('data/two_day_sample.csv.gz',sep="\t")
-
-# Filter to attack logs
-attack = df[df['attack_id'].notna()]
-print(f"Attack logs: {len(attack)}")
-print(f"Techniques: {attack['attack_type'].unique()}")
-
-# See defense response
-defense_logs = df[~df['log_type'].str.startswith('windows', na=False)]
-print(f"Defense alerts: {len(defense_logs)}")
 ```
 
 ---
