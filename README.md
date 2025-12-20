@@ -157,20 +157,60 @@ This dataset was created with several use cases in mind:
 
 ```
 ├── data/
-│   └── two_day_sample.csv.gz       # 26MB compressed sample (2 days, included in repo)
+│   ├── csv/
+│   │   └── two_day_sample.csv.gz       # 26MB CSV sample (2 days, included)
+│   └── json/
+│       └── small_sample_security_department.json  # 48MB JSON sample (Security dept)
 ├── notebooks/
-│   └── explore_dataset.ipynb       # Dataset overview, distributions   
+│   └── explore_dataset.ipynb           # Dataset analysis and examples
 ├── docs/
-│   └── SCHEMA.md                   # Complete field documentation  
+│   ├── SCHEMA.md                       # Complete field documentation
+│   └── COMPARISON.md                   # Comparison with other datasets
 └── README.md
 ```
+
+**Full Datasets (External):**
+- **CSV Format (HuggingFace):** 297MB compressed, single file
+- **JSON Format (HuggingFace):** 297MB compressed, 25 files by day
 
 ---
 
 ## Quick Start
 
-### Download Dataset
+### Option 1: Small Samples (Included in Repo)
 
+**CSV Format (2-day sample):**
+```bash
+git clone https://github.com/gregdiy/cyber_simulation
+cd cyber_simulation
+
+# Load 2-day CSV sample
+import pandas as pd
+df = pd.read_csv('data/csv/two_day_sample.csv.gz')  # 26MB, pandas handles gzip
+
+# Filter to attack logs
+attack = df[df['attack_id'].notna()]
+print(f"Attack logs: {len(attack)}")
+```
+
+**JSON Format (Security department sample):**
+```python
+import pandas as pd
+
+# Load Security department sample (162K logs, pre-labeled)
+df = pd.read_json('data/json/small_sample_security_department.json', lines=True)
+
+# Already labeled as "benign" or "malicious"
+print(df['label'].value_counts())
+
+# Fields: account, user, department, process_name, command_line, timestamp,
+#         protocol, source_ip, destination_ip, severity, log_type, 
+#         attack_type, event_type, label
+```
+
+### Option 2: Full Dataset (8.1M logs, HuggingFace)
+
+**CSV Format (single file):**
 ```bash
 cd /path/to/cyber_simulation
 
@@ -185,6 +225,36 @@ import pandas as pd
 df = pd.read_csv('data/simulation.csv.gz', sep="\t")  # Pandas handles gzip
 
 ```
+
+**JSON Format (25 files by day):**
+```bash
+cd /path/to/cyber_simulation
+
+mkdir -p data
+
+# Download JSON format (split by day)
+curl -L -o cyber_simulator_json_format.tar.gz \
+  https://huggingface.co/datasets/gregalr/cyber_simulation_json_format/resolve/main/cyber_simulator_json_format.tar.gz
+
+# Uncompress
+tar -xzf cyber_simulator_json_format.tar.gz
+
+# Results in: day_1.json, day_2.json, ..., day_25.json
+```
+
+**Load JSON by day:**
+```python
+import pandas as pd
+
+# Load single day
+df_day1 = pd.read_json('data/2025-12-14.json', lines=True)
+
+# Or load all days
+import glob
+all_files = glob.glob('day_*.json')
+df_full = pd.concat([pd.read_json(f, lines=True) for f in all_files], ignore_index=True)
+```
+
 
 ### Explore Tiny Sample (No Download)
 
