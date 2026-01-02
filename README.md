@@ -61,39 +61,39 @@ This is one approach to the training data problem—there are certainly others�
 ### Living Off The Land Attack (Intermediate Skill)
 
 **Attack Profile:**
-- **Attacker:** thomas.davis147 (Security Analyst, blends with normal activity)
+- **Attacker:** lisa.miller081 (Security Analyst, blends with normal activity)
 - **Campaign:** 24 days (Dec 21 - Jan 13, 2026)
 - **Techniques:** PowerShell to Domain Discovery to RDP to Exfiltration
-- **Service accounts hijacked:** svc_adconnect, svc_crm_integration
+- **Service accounts hijacked:** svc_backup, svc_crm_integration
 
 **Dataset Stats:**
-- **Total windows security logs:** 8,036,577
-- **Total defense logs:** 183,649
-- **Attack logs:** 491 (0.00006% - realistic signal-to-noise)
-- **Defense alerts (unique attack logs caught):** 219 (45% detection rate)
+- **Total windows security logs:** 8,064,400
+- **Total defense logs:** 181,177
+- **Attack logs:** 425 (0.00005% - realistic signal-to-noise)
+- **Defense alerts (unique attack logs caught):** 188 (44% detection rate)
 - **Users:** 500 across 10 departments
 - **Service accounts:** 54 generating background activity
 - **Timeline:** 25 days of continuous enterprise activity
 
 **Attack Buried in Noise:**
 ```
-thomas.davis147 (compromised user):
-├─ Benign logs: 2,797 (83%)
-└─ Attack logs: 491 (17%)
+lisa.miller081 (compromised user):
+├─ Benign logs: 2,509 (85%)
+└─ Attack logs: 425 (15%)
 
 svc_backup (hijacked service account):
-├─ Benign logs: 48130 (99.9%)
-└─ Attack logs: 54 (0.001%)
+├─ Benign logs: 39879 (99.9%)
+└─ Attack logs: 55 (0.001%)
 ```
 
 **Defense Response:**
 ```
-Defender ATP alerts: 153
-credential_access_alert: 32
-dlp_block: 31
-suspicious_command_line_detected: 29
+Defender ATP alerts: 111
+dlp_block: 29
 siem_alert: 23
-dlp_alert: 15
+credential_access_alert: 22
+suspicious_command_line_detected: 19
+dlp_alert: 10
 ```
 
 ---
@@ -111,10 +111,10 @@ This dataset: **24 days** (intermediate skill level)
 ### 2. **Service Account Realism**
 54 service accounts generating millions of background logs:
 ```
-svc_edr_agent: 968K logs (endpoint monitoring)
-svc_siem_collector: 940K logs (log collection)
-svc_crm_integration: 105K logs (includes 11 attack logs, 0.0001% signal)
-svc_backup=: 48K logs (includes 54 attack logs,  .001% signal)
+svc_edr_agent: 946K logs (endpoint monitoring)
+svc_siem_collector: 968K logs (log collection)
+svc_crm_integration: 109K logs (includes 10 attack logs, 0.0001% signal)
+svc_backup=: 40K logs (includes 55 attack logs,  .001% signal)
 ```
 
 Attack logs are **buried in realistic enterprise noise** - just like real breaches.
@@ -126,7 +126,7 @@ Unlike static datasets, this includes realistic defense responses:
 - **Security monitoring:** SIEM correlation, behavioral detection
 - **Network security:** DLP blocks, proxy filtering, lateral movement alerts
 
-**Detection rate:** 45% (realistic for intermediate-skill attacker)
+**Detection rate:** 44% (realistic for intermediate-skill attacker)
 
 ### 4. **Legitimate Lateral Movement**
 Shows both legitimate and malicious service account usage:
@@ -276,9 +276,9 @@ df_full = pd.concat([pd.read_json(f, lines=True) for f in all_files], ignore_ind
 ```
 timestamp          - ISO 8601: "2025-12-21 01:32:03"
 log_type           - "windows_security_event", "defender_atp_alert", etc.
-user               - Human identity: "thomas.davis147"
+user               - Human identity: "lisa.miller081"
 account            - Security principal (user or svc_*)
-hostname           - Device: "WS-SEC-0148", "DB-SRV-01"
+hostname           - Device: "WS-SEC-0082", "DB-SRV-01"
 device_type        - workstation, database_server, domain_controller
 location           - NYC_HQ, SF_Office, London, Remote_VPN
 department         - Security, Finance, Engineering, etc
@@ -335,7 +335,7 @@ Dec 21-23: Initial access and environment learning (144 logs)
 - Test-NetConnection -ComputerName 203.0.113.40 -Port 443
 - wmic process where name='powershell.exe' get ProcessId,CommandLine
 - Attacker learns defense posture through trial-and-error
-- Account: thomas.davis147 (Security Analyst - realistic tool overlap)
+- Account: lisa.miller081 (Security Analyst - realistic tool overlap)
 ```
 
 **Stages 4-6: Domain Discovery (t1087.002)**
@@ -349,7 +349,7 @@ Dec 22-26: Active Directory reconnaissance (91 logs)
 - Get-Process lsass | Select-Object Id,Name,WorkingSet
 - Identifies high-value targets and domain structure
 - Enumerates domain admins and service accounts
-- Account: thomas.davis147
+- Account: lisa.miller081
 ```
 
 **Stages 7-10: Lateral Movement (t1021.001)**
@@ -363,7 +363,7 @@ Dec 28 - Jan 2: RDP lateral movement to servers (96 logs)
 - tasklist /v /fi "imagename eq rdpclip.exe"
 - Get-Process -Name rdpclip | Select Id,Name,StartTime
 - Spreads to application servers using RDP
-- Account: thomas.davis147
+- Account: lisa.miller081
 ```
 
 **Stages 11-15: Exfiltration (t1041)**
@@ -378,7 +378,7 @@ Jan 5-13: Data collection and exfiltration (160 logs)
 - Get-ChildItem C:\temp -Filter *.zip
 - wevtutil qe Security /c:10 /rd:true /f:text (covering tracks)
 - Stages data in C:\temp, tests exfil connection, monitors network state
-- Account: thomas.davis147
+- Account: lisa.miller081
 ```
 
 ---
@@ -405,11 +405,11 @@ Jan 5-13: Data collection and exfiltration (160 logs)
 ## Dataset Statistics
 
 ```
-Total logs:           8,220,226
-Window Security Logs: 8,036,577
-Defense Logs:         183,649
-Attack logs:          491 (0.00006%)
-Defense alerts:       219 (45% detection rate)
+Total logs:           8,245,577
+Window Security Logs: 8,064,400
+Defense Logs:         181,177
+Attack logs:          425 (0.00005%)
+Defense alerts:       188 (44% detection rate)
 Users:                500
 Service accounts:     54
 Devices:              1,024

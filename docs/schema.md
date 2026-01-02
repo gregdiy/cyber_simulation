@@ -16,7 +16,7 @@ This dataset contains **realistic enterprise security logs** with an embedded mu
 **Key characteristics:**
 - 8.2M total logs spanning 25 days
 - 491 attack logs (0.00006% signal)
-- 219 defense alerts (45% detection rate)
+- 219 defense alerts (44% detection rate)
 - Attack hidden in realistic enterprise noise
 
 ---
@@ -69,8 +69,8 @@ Logs are categorized by `log_type` field:
 | event_id        | integer| conditional | Windows Event ID: `4688`, `4625`, `5156`, etc |
 
 **Key Insight:** The `user` and `account` fields show **who is using what credentials**:
-- `user=thomas.davis147, account=thomas.davis147` → User's direct activity
-- `user=thomas.davis147, account=svc_backup` → User hijacked/using service account (lateral movement)
+- `user=lisa.miller081, account=lisa.miller081` → User's direct activity
+- `user=lisa.miller081, account=svc_backup` → User hijacked/using service account (lateral movement)
 - `user=svc_database, account=svc_database` → Service account background activity
 
 ---
@@ -88,7 +88,7 @@ These fields appear **only in defense product logs** (when `log_type` is NOT `wi
 | alert_name           | string | yes         | Human-readable alert: `"Suspicious PowerShell Activity"` |
 | alert_type           | string | conditional | `"threat"`, `"behavioral"`, `"policy"`, `"rule"`     |
 | reason               | string | conditional | Why action taken: `"Malicious script pattern detected"` |
-| detection_confidence | float  | conditional | 0.0–1.0 probability this is malicious                |
+| confidence_level     | float  | conditional | 0.0–1.0 probability this is malicious                |
 | detection_type       | string | conditional | `"Behavioral"`, `"Signature"`, `"Heuristic"`, `"Policy"` |
 
 **Usage:**
@@ -185,9 +185,9 @@ These fields are present **only on events where hashing is performed** (e.g., `p
 - Stages 11–15: t1041 (Exfiltration)
 
 **Account progression:**
-- All stages → `user = "thomas.davis147"`
-- Stages 0–6 → `account = "thomas.davis147"` (direct activity)
-- Stages 7+ → `account = "svc_backup"`, `"svc_adconnect"` (service account hijacking for lateral movement and exfil)
+- All stages → `user = "lisa.miller081"`
+- Stages 0–6 → `account = "lisa.miller081"` (direct activity)
+- Stages 7+ → `account = "svc_backup"`, `"svc_crm_integration"` (service account hijacking for lateral movement and exfil)
 
 ---
 
@@ -287,27 +287,28 @@ Defense logs use specialized event types but may also reference original Windows
 
 ## Example 1: Benign User Event — Process Start (Windows)
 
+
 ```json
 {
   "event_type": "process_start",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "teams.exe",
   "command_line": "Starting teams.exe",
-  "source_ip": "10.1.20.9",
+  "source_ip": "10.1.151.56",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
-  "session_id": "thomas.davis147_2026-01-09",
+  "session_id": "lisa.miller081_2026-01-07",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "port": 0,
   "event_id": 5156,
   "parent_process": "",
   "signed": false,
   "log_type": "windows_security_event",
-  "timestamp": "2026-01-09T10:12:00.000-08:00"
+  "timestamp": "2026-01-07 08:50:00"
 }
 ```
 
@@ -320,19 +321,19 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "email_access",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "outlook.exe",
   "command_line": "outlook.exe /select outlook:inbox",
-  "source_ip": "10.1.20.9",
+  "source_ip": "10.1.148.148",
   "destination_ip": "10.1.50.15",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
-  "session_id": "thomas.davis147_2026-01-09",
+  "session_id": "lisa.miller081_2025-12-26",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "port": 993,
   "protocol": "IMAPS",
   "event_id": 4663,
@@ -340,7 +341,7 @@ Defense logs use specialized event types but may also reference original Windows
   "error": "",
   "signed": false,
   "log_type": "windows_security_event",
-  "timestamp": "2026-01-09T14:14:00.000-08:00"
+  "timestamp": "2025-12-26 18:35:00"
 }
 ```
 
@@ -353,13 +354,13 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "kerberos_service_ticket_success",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "command_line": "Request service ticket for AD Connect",
-  "source_ip": "10.1.20.9",
-  "destination_ip": "10.1.52.160",
+  "source_ip": "10.1.92.131",
+  "destination_ip": "10.1.52.118",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
   "session_id": "svc_adconnect_2026-01-09",
@@ -370,7 +371,7 @@ Defense logs use specialized event types but may also reference original Windows
   "event_id": 4769,
   "parent_process": "cmd.exe",
   "log_type": "windows_security_event",
-  "timestamp": "2026-01-09T14:02:05.000-08:00"
+  "timestamp": "2025-12-27 12:36:05"
 }
 ```
 
@@ -383,18 +384,18 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "admin_action",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "powershell.exe",
   "command_line": "Get-WmiObject Win32_ComputerSystem | Select-Object Domain,DomainRole",
-  "source_ip": "10.1.255.64",
+  "source_ip": "10.2.161.12",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
-  "session_id": "ongoing_attack_ATK_29367_2025-12-23",
+  "session_id": "ongoing_attack_ATK_29367_2025-12-22",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "protocol": "TCP",
   "event_id": 4672,
   "parent_process": "powershell.exe",
@@ -402,7 +403,7 @@ Defense logs use specialized event types but may also reference original Windows
   "attack_type": "t1059.001",
   "stage_number": "3",
   "log_type": "windows_security_event",
-  "timestamp": "2025-12-23T06:26:04.000-08:00"
+  "timestamp": "2025-12-22 19:06:00"
 }
 ```
 
@@ -411,35 +412,36 @@ Defense logs use specialized event types but may also reference original Windows
 ---
 
 ## Example 5: Attack Event — Domain Discovery (Windows)
+(admin_action,lisa.miller081,WS-SEC-0082,whoami.exe,whoami,10.1.148.148,10.2.50.10,Security,SF_Office,workstation,true,ongoing_attack_ATK_29367_2025-12-23,false,lisa.miller081,null,null,null,null,windows_security_event,2025-12-23 00:43:05,2,TCP)
 
 ```json
 {
   "event_type": "admin_action",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "whoami.exe",
   "command_line": "whoami",
-  "source_ip": "10.1.255.64",
-  "destination_ip": "10.3.50.10",
+  "source_ip": "10.1.148.148",
+  "destination_ip": "10.2.50.10",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
   "session_id": "ongoing_attack_ATK_29367_2025-12-23",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "protocol": "TCP",
   "event_id": 4672,
   "parent_process": "cmd.exe",
   "attack_id": "ATK_29367",
-  "attack_type": "t1087.002",
-  "stage_number": "4",
+  "attack_type": "t1059.001",
+  "stage_number": "2",
   "log_type": "windows_security_event",
-  "timestamp": "2025-12-23T06:23:02.000-08:00"
+  "timestamp": "2025-12-23 00:43:05"
 }
 ```
 
-**Key:** Attack stage 4 - Domain discovery. Simple whoami command during reconnaissance phase.
+**Key:** Attack stage 2 - Domain discovery. Simple whoami command during reconnaissance phase.
 
 ---
 
@@ -448,17 +450,17 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "kerberos_service_ticket_success",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "BackupExec.exe",
   "command_line": "Request service ticket for backup service",
-  "source_ip": "10.1.20.9",
-  "destination_ip": "10.3.50.144",
+  "source_ip": "10.1.151.56",
+  "destination_ip": "10.2.50.6",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
-  "session_id": "svc_backup_2026-01-09",
+  "session_id": "svc_backup_2026-01-13",
   "service_account": false,
   "account": "svc_backup",
   "port": 88,
@@ -467,13 +469,13 @@ Defense logs use specialized event types but may also reference original Windows
   "parent_process": "services.exe",
   "attack_id": "ATK_29367",
   "attack_type": "t1041",
-  "stage_number": "14",
+  "stage_number": "15",
   "log_type": "windows_security_event",
-  "timestamp": "2026-01-09T02:43:00.000-08:00"
+  "timestamp": "2026-01-13 04:56:02"
 }
 ```
 
-**Key:** Attack stage 14 - Service account hijacking. `user=thomas.davis147` but `account=svc_backup` shows attacker using stolen service account credentials. **Has attack_id** - this is malicious lateral movement.
+**Key:** Attack stage 14 - Service account hijacking. `user=lisa.miller081` but `account=svc_backup` shows attacker using stolen service account credentials. **Has attack_id** - this is malicious lateral movement.
 
 ---
 
@@ -482,32 +484,32 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "network_connection",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "powershell.exe",
   "command_line": "Test-WSMan -ComputerName APP-SRV-03",
-  "source_ip": "10.1.142.86",
-  "destination_ip": "10.3.50.60",
+  "source_ip": "10.1.92.131",
+  "destination_ip": "10.2.50.60",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": false,
   "session_id": "ongoing_attack_ATK_29367_2025-12-29",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "protocol": "WinRM",
   "event_id": 5156,
   "parent_process": "powershell.exe",
   "error": "Test-WSMan : Access is denied.",
   "attack_id": "ATK_29367",
   "attack_type": "t1021.001",
-  "stage_number": "8",
+  "stage_number": "7",
   "log_type": "windows_security_event",
-  "timestamp": "2025-12-29T04:30:03.000-08:00"
+  "timestamp": "2025-12-28 22:23:01"
 }
 ```
 
-**Key:** Attack stage 8 - RDP lateral movement attempt. Failed connection (`success=false`, error message present). Shows realistic attacker trial-and-error.
+**Key:** Attack stage 7 - RDP lateral movement attempt. Failed connection (`success=false`, error message present). Shows realistic attacker trial-and-error.
 
 ---
 
@@ -516,26 +518,26 @@ Defense logs use specialized event types but may also reference original Windows
 ```json
 {
   "event_type": "admin_action",
-  "user": "thomas.davis147",
-  "hostname": "WS-SEC-0148",
+  "user": "lisa.miller081",
+  "hostname": "WS-SEC-0082",
   "process_name": "tasklist.exe",
   "command_line": "tasklist",
-  "source_ip": "10.1.93.25",
+  "source_ip": "10.2.161.12",
   "department": "Security",
-  "location": "London",
+  "location": "SF_Office",
   "device_type": "workstation",
   "success": true,
-  "session_id": "ongoing_attack_ATK_29367_2026-01-08",
+  "session_id": "ongoing_attack_ATK_29367_2025-12-21",
   "service_account": false,
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "protocol": "TCP",
   "event_id": 4672,
   "parent_process": "cmd.exe",
   "attack_id": "ATK_29367",
   "attack_type": "t1041",
-  "stage_number": "14",
+  "stage_number": "1",
   "log_type": "windows_security_event",
-  "timestamp": "2026-01-08T05:24:04.000-08:00"
+  "timestamp": "2025-12-21 13:20:04"
 }
 ```
 
@@ -545,19 +547,19 @@ Defense logs use specialized event types but may also reference original Windows
 
 ## Example 9: Defense Response — Defender ATP Alert (Defense Log)
 
+
 ```json
 {
-  "timestamp": "2025-12-23 06:41:00",
+  "timestamp": "2025-12-23 01:51:05",
   "log_type": "defender_atp_alert",
-  "account": "thomas.davis147",
+  "account": "lisa.miller081",
   "alert_name": "Suspicious PowerShell Activity",
   "command_line": "Get-WmiObject Win32_ComputerSystem",
-  "detection_confidence": 0.82,
+  "confidence_level": 0.75,
   "parent_process": "powershell.exe",
   "process_name": "powershell.exe",
-  "severity": "high",
+  "severity": "medium",
   "vendor": "Microsoft Defender",
-  "investigation_id": 94521,
   "action_taken": "logged",
   "attack_id": "ATK_29367",
   "stage_number": "3"
@@ -568,25 +570,25 @@ Defense logs use specialized event types but may also reference original Windows
 
 ---
 
-## Example 10: Defense Response — DLP Block (Defense Log)
+## Example 10: Defense Response — DLP Alert (Defense Log)
 
 ```json
 {
-  "timestamp": "2026-01-08 05:30:00",
-  "log_type": "dlp_block",
-  "account": "thomas.davis147",
+  "timestamp": "2026-01-07 02:23:00",
+  "log_type": "dlp_alert",
+  "account": "svc_backup",
   "destination_ip": "203.0.113.30",
   "port": 8443,
-  "policy_violated": "Prevent Data Exfiltration",
-  "severity": "critical",
-  "action_taken": "blocked",
-  "reason": "Upload to External Destination",
+  "alert_name": "Compressed Archive Upload Detected",
+  "severity": "high",
+  "action_taken": "logged",
+  "reason": "Sensitive File Type",
   "attack_id": "ATK_29367",
-  "stage_number": "14"
+  "stage_number": "12"
 }
 ```
 
-**Key:** DLP blocked exfiltration attempt to external C2 (203.0.113.30). Shows `policy_violated` and `action_taken="blocked"`. Defense successfully prevented this stage 14 action.
+**Key:** DLP Alert on exfiltration attempt to external C2 (203.0.113.30) through svc_backup. Shows `alert_name` and `action_taken="logged"`. Defense successfully prevented this stage 13 action.
 
 ---
 
@@ -606,8 +608,8 @@ Defense logs use specialized event types but may also reference original Windows
 
 ## Lateral Movement Detection
 The critical pattern: **`user != account`**
-- `user=thomas.davis147, account=svc_adconnect` with no attack_id → **Legitimate** (Security analyst using service account for work)
-- `user=thomas.davis147, account=svc_backup` with `attack_id="ATK_29367"` → **Malicious** (attacker hijacked service account)
+- `user=lisa.miller081, account=svc_crm_integration` with no attack_id → **Legitimate** (Security analyst using service account for work)
+- `user=lisa.miller081, account=svc_backup` with `attack_id="ATK_29367"` → **Malicious** (attacker hijacked service account)
 - Detection requires: Context (what command?), baseline (normal for this user?), sequence (what happened before?)
 
 ## Hashing Behavior
@@ -645,7 +647,7 @@ This dataset demonstrates several realistic detection challenges:
 Security analysts legitimately use the same tools as attackers:
 - PowerShell, net.exe, whoami.exe, tasklist.exe, dsquery.exe
 - Process name alone = insufficient for detection
-- thomas.davis147 is a Security Analyst - his benign work overlaps with attack tools
+- lisa.miller081 is a Security Analyst - his benign work overlaps with attack tools
 
 ## 2. Service Account Noise
 - Service accounts generate millions of logs
@@ -658,12 +660,12 @@ Security analysts legitimately use the same tools as attackers:
 - Requires behavioral analysis to distinguish
 
 ## 4. Multi-Week Timeline
-- 23-day campaign (Dec 21 - Jan 13) avoids spike detection
+- 24-day campaign (Dec 21 - Jan 13) avoids spike detection
 - 1-3 actions per day blends with normal activity
 - Gradual progression from reconnaissance to exfiltration
 
 ## 5. Defense Product Limitations
-- 45% detection rate (intermediate attacker)
+- 44% detection rate (intermediate attacker)
 - Some techniques evade all defenses
 - Multiple products needed for coverage
 - False negatives during lateral movement stages
@@ -684,7 +686,7 @@ Security analysts legitimately use the same tools as attackers:
 ## Scope
 - Fully synthetic (no real user PII or company data)
 - Single attack chain (living_off_land_basic)
-- One attacker (thomas.davis147, Security Analyst)
+- One attacker (lisa.miller081, Security Analyst)
 - One skill level (intermediate attacker)
 - One EDR vendor (Microsoft Defender ATP)
 - Single defense configuration (Microsoft-based enterprise stack)
