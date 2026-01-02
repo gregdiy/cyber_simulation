@@ -8,13 +8,27 @@
 
 A **realistic enterprise security log dataset** featuring:
 - **8+ million enterprise logs** with realistic background noise
-- **Full APT attack campaign** spanning 23 days
+- **Full APT attack campaign** spanning 24 days
 - **55+ service accounts** with authentic activity patterns
 - **500 users** across 10 departments with role-based behavior
 - **Defense product logs** (EDR, DLP, SIEM, PAM, MFA) that react to attacks
 - **Labeled ground truth** for every attack action
 
 Built by an ML engineer working in cybersecurity who encountered a common challenge: limited access to realistic, labeled security data for training and testing detection systems.
+
+---
+
+## Table of Contents
+- [Background & Motivation](#background--motivation)
+- [Quick Start](#quick-start)
+- [Attack Chain](#attack-chain-living_off_land_basic)
+- [Why This Attack Is Hard to Detect](#why-this-attack-is-hard-to-detect)
+- [Dataset Statistics](#dataset-statistics)
+- [Schema Overview](#schema-overview)
+- [How This Dataset Differs](#how-this-dataset-differs)
+- [Dataset Scope](#dataset-scope)
+- [Repository Contents](#repository-contents)
+- [License & Attribution](#license--attribution)
 
 ---
 
@@ -47,39 +61,39 @@ This is one approach to the training data problem—there are certainly others�
 ### Living Off The Land Attack (Intermediate Skill)
 
 **Attack Profile:**
-- **Attacker:** joseph.wilson475 (Security Analyst, blends with normal activity)
-- **Campaign:** 23 days (Dec 16 - Jan 7, 2026)
+- **Attacker:** lisa.miller081 (Security Analyst, blends with normal activity)
+- **Campaign:** 24 days (Dec 21 - Jan 13, 2026)
 - **Techniques:** PowerShell to Domain Discovery to RDP to Exfiltration
-- **Service accounts hijacked:** svc_database, svc_backup, svc_adconnect, svc_fileserver
+- **Service accounts hijacked:** svc_backup, svc_crm_integration
 
 **Dataset Stats:**
-- **Total logs:** 8,108,152
-- **Attack logs:** 570 (0.007% - realistic signal-to-noise)
-- **Defense alerts:** 209 (37% detection rate)
+- **Total windows security logs:** 8,064,400
+- **Total defense logs:** 181,177
+- **Attack logs:** 425 (0.00005% - realistic signal-to-noise)
+- **Defense alerts (unique attack logs caught):** 188 (44% detection rate)
 - **Users:** 500 across 10 departments
-- **Service accounts:** 55 generating background activity
+- **Service accounts:** 54 generating background activity
 - **Timeline:** 25 days of continuous enterprise activity
 
 **Attack Buried in Noise:**
 ```
-joseph.wilson475 (compromised user):
-├─ Benign logs: 2,718 (88%)
-└─ Attack logs: 361 (12%)
+lisa.miller081 (compromised user):
+├─ Benign logs: 2,509 (85%)
+└─ Attack logs: 425 (15%)
 
-svc_database (hijacked service account):
-├─ Benign logs: 185,254 (99.97%)
-└─ Attack logs: 64 (0.03%)
+svc_backup (hijacked service account):
+├─ Benign logs: 39879 (99.9%)
+└─ Attack logs: 55 (0.001%)
 ```
 
 **Defense Response:**
 ```
-Defender ATP alerts: 71
-DLP blocks: 52
-SIEM correlation: 14
-Credential monitoring: 11
-PAM denials: 6
-MFA failures: 4
-Lateral movement alerts: 3
+Defender ATP alerts: 111
+dlp_block: 29
+siem_alert: 23
+credential_access_alert: 22
+suspicious_command_line_detected: 19
+dlp_alert: 10
 ```
 
 ---
@@ -92,15 +106,15 @@ Not compressed lab scenarios, actual APT behavior:
 - **Intermediate:** 21-35 days (patient, learning)
 - **Advanced:** 60+ days (months-long dwell time)
 
-This dataset: **23 days** (intermediate skill level)
+This dataset: **24 days** (intermediate skill level)
 
 ### 2. **Service Account Realism**
-55+ service accounts generating millions of background logs:
+54 service accounts generating millions of background logs:
 ```
-svc_edr_agent: 951K logs (endpoint monitoring)
-svc_siem_collector: 935K logs (log collection)
-svc_database: 185K logs (includes 64 attack logs, 0.034% signal)
-svc_backup: 27K logs (includes 61 attack logs,  0.22% signal)
+svc_edr_agent: 946K logs (endpoint monitoring)
+svc_siem_collector: 968K logs (log collection)
+svc_crm_integration: 109K logs (includes 10 attack logs, 0.0001% signal)
+svc_backup=: 40K logs (includes 55 attack logs,  .001% signal)
 ```
 
 Attack logs are **buried in realistic enterprise noise** - just like real breaches.
@@ -112,7 +126,7 @@ Unlike static datasets, this includes realistic defense responses:
 - **Security monitoring:** SIEM correlation, behavioral detection
 - **Network security:** DLP blocks, proxy filtering, lateral movement alerts
 
-**Detection rate:** 37% (realistic for intermediate-skill attacker)
+**Detection rate:** 44% (realistic for intermediate-skill attacker)
 
 ### 4. **Legitimate Lateral Movement**
 Shows both legitimate and malicious service account usage:
@@ -130,13 +144,13 @@ This dataset was created with several use cases in mind:
 
 ### **Training ML Detection Models**
 - Labeled ground truth for supervised learning
-- Realistic signal-to-noise ratio (0.007% attack signal)
+- Realistic signal-to-noise ratio (0.00008% attack signal)
 - Service account and user behavior baselines
 - Defense product logs as additional features
 
 ### **Validating Detection Logic**
 - Test whether your rules detect this intermediate-skill attack
-- Identify which stages evade detection (37% detection rate in this data)
+- Identify which stages evade defense detection
 - Understand false positive rates in realistic noise
 
 ### **SOC Analyst Training**
@@ -149,7 +163,7 @@ This dataset was created with several use cases in mind:
 - Analyze service account hijacking techniques
 - Understand defense product effectiveness
 
-**Note:** This is a **static dataset** generated from a simulation framework. The full simulation capability (custom defense configurations, different attack chains, varying skill levels) is part of ongoing research work. This dataset represents one specific scenario: a 23-day intermediate-skill living-off-the-land attack.
+**Note:** This is a **static dataset** generated from a simulation framework. The full simulation capability (custom defense configurations, different attack chains, varying skill levels) is part of ongoing research work. This dataset represents one specific scenario: a 24-day intermediate-skill living-off-the-land attack.
 
 ---
 
@@ -169,8 +183,8 @@ This dataset was created with several use cases in mind:
 ```
 
 **Full Datasets (External):**
-- **CSV Format (HuggingFace):** 297MB compressed, single file
-- **JSON Format (HuggingFace):** 361MB compressed, 25 files by day
+- **CSV Format (HuggingFace):** 231MB compressed, single file
+- **JSON Format (HuggingFace):** 287MB compressed, 25 files by day
 
 ---
 
@@ -246,11 +260,11 @@ tar -xzf cyber_simulator_json_format.tar.gz
 import pandas as pd
 
 # Load single day
-df_day1 = pd.read_json('data/2025-12-14.json', lines=True)
+df_day1 = pd.read_json('data/2025-12-21.json', lines=True)
 
 # Or load all days
 import glob
-all_files = glob.glob('day_*.json')
+all_files = glob.glob('data/*.json')
 df_full = pd.concat([pd.read_json(f, lines=True) for f in all_files], ignore_index=True)
 ```
 
@@ -260,11 +274,11 @@ df_full = pd.concat([pd.read_json(f, lines=True) for f in all_files], ignore_ind
 
 ### Core Fields
 ```
-timestamp          - ISO 8601: "2025-12-16 01:32:03"
+timestamp          - ISO 8601: "2025-12-21 01:32:03"
 log_type           - "windows_security_event", "defender_atp_alert", etc.
-user               - Human identity: "joseph.wilson475"
+user               - Human identity: "lisa.miller081"
 account            - Security principal (user or svc_*)
-hostname           - Device: "WS-SEC-0476", "DB-SRV-01"
+hostname           - Device: "WS-SEC-0082", "DB-SRV-01"
 device_type        - workstation, database_server, domain_controller
 location           - NYC_HQ, SF_Office, London, Remote_VPN
 department         - Security, Finance, Engineering, etc
@@ -283,7 +297,7 @@ protocol           - TCP, UDP, HTTPS, RDP
 
 ### Attack Labels
 ```
-attack_id          - "ATK_84073" or null
+attack_id          - "ATK_29367" or null
 attack_type        - "t1059.001" (MITRE technique) or null
 stage_number       - "0" through "15" or null
 ```
@@ -313,34 +327,58 @@ See `docs/SCHEMA.md` for complete documentation including all defense fields.
 
 **Stages 0-3: PowerShell Execution (t1059.001)**
 ```
-Dec 16: Initial access attempts (multiple failures)
-- powershell.exe -ExecutionPolicy Bypass
-- Blocked by: AMSI, AppLocker, Defender
-- Attacker learns environment defenses
+Dec 21-23: Initial access and environment learning (144 logs)
+- Get-ChildItem Env: | Where-Object {$_.Name -like '*PATH*'}
+- reg query HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell
+- nltest /domain_trusts
+- Get-WmiObject Win32_ComputerSystem | Select-Object Domain,DomainRole
+- Test-NetConnection -ComputerName 203.0.113.40 -Port 443
+- wmic process where name='powershell.exe' get ProcessId,CommandLine
+- Attacker learns defense posture through trial-and-error
+- Account: lisa.miller081 (Security Analyst - realistic tool overlap)
 ```
 
 **Stages 4-6: Domain Discovery (t1087.002)**
 ```
-Dec 17-19: Reconnaissance
-- net user, whoami, systeminfo
-- Get-ADUser, Get-ADGroupMember
-- Identifies service accounts and admin groups
+Dec 22-26: Active Directory reconnaissance (91 logs)
+- Get-ADUser -Filter * -Properties LastLogonDate | Select-Object Name,LastLogonDate
+- net accounts /domain
+- Get-ADGroupMember -Identity "Domain Admins" | Select-Object Name,SamAccountName
+- dsquery user -limit 10, dsquery group -name "Domain Admins"
+- net group "Domain Admins" /domain
+- Get-Process lsass | Select-Object Id,Name,WorkingSet
+- Identifies high-value targets and domain structure
+- Enumerates domain admins and service accounts
+- Account: lisa.miller081
 ```
 
 **Stages 7-10: Lateral Movement (t1021.001)**
 ```
-Dec 23-31: RDP to servers
-- mstsc.exe to DB-SRV-01
-- Hijacks svc_database account
-- Moves to svc_backup, svc_adconnect
+Dec 28 - Jan 2: RDP lateral movement to servers (96 logs)
+- ping APP-SRV-03
+- Test-WSMan -ComputerName APP-SRV-03
+- reg query HKCU\Software\Microsoft\Terminal Server Client\Servers
+- Get-NetTCPConnection -RemotePort 3389 -State Established
+- cmdkey /list
+- tasklist /v /fi "imagename eq rdpclip.exe"
+- Get-Process -Name rdpclip | Select Id,Name,StartTime
+- Spreads to application servers using RDP
+- Account: lisa.miller081
 ```
 
 **Stages 11-15: Exfiltration (t1041)**
 ```
-Jan 2-7: Data theft
-- Compress-Archive sensitive files
-- Exfil via svc_database permissions
-- Multi-stage data transfer
+Jan 5-13: Data collection and exfiltration (160 logs)
+- dir C:\temp\archive.zip
+- Get-ItemProperty C:\temp\archive.zip | Select-Object Length
+- Test-NetConnection 203.0.113.30 -Port 8443
+- nslookup 203.0.113.30
+- Get-NetTCPConnection -State Established | Select-Object LocalAddress,RemoteAddress,RemotePort
+- netstat -ano | findstr :8443
+- Get-ChildItem C:\temp -Filter *.zip
+- wevtutil qe Security /c:10 /rd:true /f:text (covering tracks)
+- Stages data in C:\temp, tests exfil connection, monitors network state
+- Account: lisa.miller081
 ```
 
 ---
@@ -351,10 +389,10 @@ Jan 2-7: Data theft
    PowerShell, net.exe, RDP - all used legitimately by Security dept
 
 2. **Service account activity provides perfect cover**  
-   svc_database generates 185K logs - 64 attack logs blend in (0.03%)
+   svc_backup generates 48K logs - 51 attack logs blend in (0.04%)
 
 3. **Multi-week dwell time avoids spike detection**  
-   23-day campaign - no sudden anomaly, gradual progression
+   24-day campaign - no sudden anomaly, gradual progression
 
 4. **Legitimate credentials bypass many controls**  
    Hijacked service accounts have authorized access
@@ -367,16 +405,18 @@ Jan 2-7: Data theft
 ## Dataset Statistics
 
 ```
-Total logs:        8,108,152
-Attack logs:       570 (0.007%)
-Defense alerts:    209 (37% detection rate)
-Users:             500
-Service accounts:  55
-Devices:           1,024
-Locations:         4 (NYC, SF, London, Remote VPN)
-Duration:          25 days
-Attack stages:     16
-MITRE techniques:  4
+Total logs:           8,245,577
+Window Security Logs: 8,064,400
+Defense Logs:         181,177
+Attack logs:          425 (0.00005%)
+Defense alerts:       188 (44% detection rate)
+Users:                500
+Service accounts:     54
+Devices:              1,024
+Locations:            4 (NYC, SF, London, Remote VPN)
+Duration:             25 days
+Attack stages:        16
+MITRE techniques:     4
 ```
 
 ---
@@ -423,17 +463,17 @@ Examples: Cyber ranges, virtual labs, CTF platforms
 This release focuses on one well-developed scenario to provide depth and realism:
 
 **Attack Profile:**
-- Campaign: 23-day living-off-the-land attack
+- Campaign: 24-day living-off-the-land attack
 - Skill level: Intermediate (realistic failure rates, learning behavior)
 - Environment: Enterprise on-premises (Active Directory, Windows)
-- Scale: 8.1M logs across 500 users and 55 service accounts
+- Scale: 8.1M logs across 500 users and 54 service accounts
 
 **Defense Configuration:**
 - EDR: Microsoft Defender ATP
 - Access control: PAM, MFA, NAC
 - Network security: DLP, proxy filtering
 - Monitoring: SIEM correlation, behavioral detection
-- Detection rate: 37% (realistic for this attacker skill level)
+- Detection rate: 45% (realistic for this attacker skill level)
 
 **Design Choice:**
 We focused on one scenario executed at high fidelity rather than many scenarios with less depth. This allows for detailed analysis of attack progression, defense response patterns, and the challenges of detecting sophisticated attacks in realistic enterprise noise.
@@ -463,8 +503,8 @@ Week 4: Exfiltration (final push)
 
 **Real-world validation:**
 - Mandiant M-Trends: Average dwell time 16-21 days (intermediate attackers)
-- FireEye: Advanced attackers → 60-90 days
-- This dataset: 23 days for intermediate = realistic
+- FireEye: Advanced attackers  60-90 days
+- This dataset: 24 days for intermediate = realistic
 
 ---
 
