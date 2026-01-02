@@ -47,7 +47,7 @@ Logs are categorized by `log_type` field:
 | --------------- | ------ | ----------- | --------------------------------------------- |
 | timestamp       | string | yes         | ISO 8601: `"2025-12-21 14:32:01"`             |
 | log_type        | string | yes         | Log source (see Log Type Categories above)    |
-| user            | string | yes         | Human identity: `"thomas.davis147"` or `"NA"` |
+| user            | string | yes         | Human identity: `"lisa.miller081"` or `"NA"` |
 | account         | string | yes         | Security principal (user or `svc_*`)          |
 | service_account | boolean| yes         | `true` or `false`                             |
 | hostname        | string | yes         | Device: `"WS-SEC-0148"`, `"DB-SRV-01"`        |
@@ -63,7 +63,7 @@ Logs are categorized by `log_type` field:
 | destination_ip  | string | conditional | `"10.1.52.52"` or `"203.0.113.30"` (C2)       |
 | port            | integer| conditional | `88`, `443`, `3389`, etc                      |
 | protocol        | string | conditional | `TCP`, `UDP`, `HTTPS`, `RDP`, `Kerberos`, etc |
-| session_id      | string | conditional | `"thomas.davis147_2025-12-21"`                |
+| session_id      | string | conditional | `"lisa.miller081_2025-12-22"`                |
 | success         | boolean| conditional | `true` or `false` (for Windows events)        |
 | error           | string | conditional | Error message if `success=false`              |
 | event_id        | integer| conditional | Windows Event ID: `4688`, `4625`, `5156`, etc |
