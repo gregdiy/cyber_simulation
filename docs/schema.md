@@ -15,8 +15,8 @@ This dataset contains **realistic enterprise security logs** with an embedded mu
 
 **Key characteristics:**
 - 8.2M total logs spanning 25 days
-- 491 attack logs (0.00006% signal)
-- 219 defense alerts (44% detection rate)
+- 425 attack logs (0.00006% signal)
+- 188 defense alerts (44% detection rate)
 - Attack hidden in realistic enterprise noise
 
 ---
