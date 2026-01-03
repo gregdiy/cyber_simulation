@@ -22,6 +22,7 @@ Built by an ML engineer working in cybersecurity who encountered a common challe
 - [Background & Motivation](#background--motivation)
 - [Quick Start](#quick-start)
 - [Attack Chain](#attack-chain-living_off_land_basic)
+- [Evaluate detections](#evaluate-detections-benchmark)
 - [Why This Attack Is Hard to Detect](#why-this-attack-is-hard-to-detect)
 - [Dataset Statistics](#dataset-statistics)
 - [Schema Overview](#schema-overview)
@@ -314,6 +315,63 @@ reason             - "Malicious script pattern detected"
 ```
 
 See `docs/SCHEMA.md` for complete documentation including all defense fields.
+
+---
+
+## Evaluate detections (benchmark)
+
+### Scoring definition (what counts)
+
+All benchmark metrics are computed **only** on Windows attacker-action telemetry:
+
+- **Eligible rows:** `log_type == "windows_security_event"`
+- **Positive label:** `attack_id` is present (non-null / not `"NA"`) within eligible rows
+
+All other log types (DLP blocks, SIEM alerts, EDR alerts, etc.) are included in the dataset for context but are **not scored**.
+
+### Submission format
+
+Submit a file that lists the `row_id` values you flagged as suspicious:
+
+- `row_id` is the **0-based row number** in `data/simulation.csv.gz` (header excluded).
+- Do **not** shuffle or re-sort the dataset before generating `row_id`s.
+- Alerts on rows outside the eligible universe (`windows_security_event`) are ignored by the evaluator.
+
+Accepted formats for predictions:
+- CSV/TSV with a `row_id` column
+- JSON list of integers: `[12, 19, 204, ...]`
+- Plain text: one integer `row_id` per line
+
+### Example: create a submission file (CSV with `row_id`)
+
+```python
+import pandas as pd
+
+row_offset = 0
+alert_row_ids = []
+
+for chunk in pd.read_csv("data/simulation.csv.gz", sep="\t", chunksize=500_000):
+    # TODO: replace this rule with your detector/model
+    mask = (
+        (chunk["event_type"] == "process_start")
+        & chunk["command_line"].astype(str).str.contains("mimikatz", case=False, na=False)
+    )
+
+    # Convert chunk-local indices to global row_id
+    alert_row_ids.extend((mask[mask].index.to_numpy() + row_offset).tolist())
+    row_offset += len(chunk)
+
+pd.DataFrame({"row_id": alert_row_ids}).to_csv("submission.csv", index=False)
+print("Wrote submission.csv with", len(alert_row_ids), "alerts")
+```
+
+### Run evaluation
+
+```bash
+python evaluate.py --data data/simulation.csv.gz --pred submission.csv --out metrics.json
+```
+
+The evaluator outputs precision/recall/F1, FP/day, recall by technique/stage, and time-to-detect.
 
 ---
 
