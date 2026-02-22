@@ -132,7 +132,6 @@ print("Attack records:", len(attack))
 ### Option 2: Full dataset (JSON, split by day — HuggingFace)
 
 ```bash
-mkdir -p data
 
 curl -L -o data/cyber_simulator_json_format.zip \
   https://huggingface.co/datasets/gregalr/cyber_simulation_json_format/resolve/main/cyber_simulator_json_format.zip
