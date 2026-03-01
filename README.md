@@ -31,8 +31,8 @@ Built by an ML engineer working in cybersecurity who hit the same wall most team
 - [Repository Contents](#repository-contents)
 - [Quick Start](#quick-start)
 - [BigQuery (public) — browse with SQL (no local setup)](#bigquery-public--browse-with-sql-no-local-setup)
-- [Evaluate detections (benchmark)](#evaluate-detections-benchmark)
-- [Attack Chain](#attack-chain-multi_user_pivot_lotl)
+- [Attack Chain](#attack-chain-living_off_land_basic)
+- [Evaluate detections](#evaluate-detections-benchmark)
 - [Why This Attack Is Hard to Detect](#why-this-attack-is-hard-to-detect)
 - [Dataset Statistics](#dataset-statistics)
 - [Schema Overview](#schema-overview)
@@ -262,7 +262,47 @@ The evaluator outputs precision/recall/F1, FP/day, recall by stage/technique, an
 
 ---
 
-## Attack Chain: `multi_user_pivot_lotl`
+## BigQuery (public) — browse with SQL (no local setup)
+
+You can explore the dataset directly in the BigQuery web UI.
+
+### Steps
+1. Open BigQuery Studio: https://console.cloud.google.com/bigquery
+2. In the query editor, run the sample queries below against:
+   - **Table:** `diymind-dev.phantom_armor_benchmark.simulation`
+
+> Tip: If you don’t see the project/dataset in the Explorer panel, use the query editor anyway — fully-qualified table names work even if the dataset isn’t pinned in your UI.
+
+### Sample queries
+
+**1) Peek at the full dataset (all log types)**
+```sql
+SELECT *
+FROM `diymind-dev.phantom_armor_benchmark.simulation`
+LIMIT 1000;
+```
+
+**2) Windows attacker-action telemetry only**
+```sql
+SELECT *
+FROM `diymind-dev.phantom_armor_benchmark.simulation`
+WHERE log_type = "windows_security_event"
+LIMIT 1000;
+```
+
+**3) Attack-labeled Windows security events**
+```sql
+SELECT *
+FROM `diymind-dev.phantom_armor_benchmark.simulation`
+WHERE log_type = "windows_security_event"
+  AND attack_id IS NOT NULL
+  AND CAST(attack_id AS STRING) NOT IN ("NA", "")
+ORDER BY timestamp
+LIMIT 500;
+```
+
+---
+## Attack Chain: living_off_land_basic
 
 **Type:** living-off-the-land (PowerShell / remote execution / discovery / lateral movement / exfiltration)
 
