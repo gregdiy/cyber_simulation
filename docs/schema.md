@@ -1,6 +1,6 @@
 # Enterprise Security Log Dataset — Schema Documentation
 
-**Dec 2025 – Jan 2026 | Multi-User Pivot Living-Off-The-Land Campaign | ATK_50673**
+**Dec 2025 – Jan 2026 | Multi-User Pivot Living-Off-The-Land Campaign | ATK_70246**
 
 ---
 
@@ -21,13 +21,13 @@ Logs include:
 
 | Metric | Value |
 |---|---|
-| Total logs | 7,961,002 |
+| Total logs | 7,920,291 |
 | Duration | 25 days |
-| Attacker actions (`attack_id` non-null) | 345 |
-| Defense / observability logs | 142,454 |
-| Attack-triggered observability events | 285 |
+| Attacker actions (`attack_id` non-null) | 342 |
+| Defense / observability logs | 142,184 |
+| Attack-triggered observability events | 269 |
 
-> **Note on observability count:** not de-duplicated — a single attacker action can generate multiple observability events across different tools or alert types.
+> **Note on observability count:** not de-duplicated, a single attacker action can generate multiple observability events across different tools or alert types.
 
 ---
 
@@ -81,7 +81,7 @@ These fields are either always present or commonly present across all log famili
 | `account` | string | yes | Security principal performing the action: user (`daniel.davis004`) or service account (`svc_*`) |
 | `user` | string/null | conditional | Human identity context when available; may be null for some defense logs or pure service account activity |
 | `service_account` | boolean | yes | `true` if `account` is a service account (`svc_*`), else `false` |
-| `hostname` | string | yes | Device name: `WS-SAL-0005`, `WS-IT-0063`, `DB-SRV-02`, etc. |
+| `hostname` | string | yes | Device name: `WS-SAL-0005`, `WS-IT-0071`, `DB-SRV-02`, etc. |
 | `device_type` | string | yes | `workstation`, `database_server`, `domain_controller`, `web_server`, `app_server` |
 | `location` | string | yes | `NYC_HQ`, `SF_Office`, `London`, `Remote_VPN` |
 | `department` | string | conditional | Department label for user identities (e.g. `Sales`, `IT`, `Finance`) |
@@ -147,7 +147,7 @@ These fields appear on defense logs (when `log_type != windows_security_event`).
 
 ## File Hash & Reputation Fields
 
-Hashing fields appear only on events where the simulated stack hashes an artifact — commonly `process_start`, file creation/modification events, and select network/file events.
+Hashing fields appear only on events where the simulated stack hashes an artifact, commonly `process_start`, file creation/modification events, and select network/file events.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -171,7 +171,7 @@ Ground truth is expressed via the `attack_id` field.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `attack_id` | string/null | yes | `ATK_50673` or `null` |
+| `attack_id` | string/null | yes | `ATK_70246` or `null` |
 | `attack_type` | string/null | conditional | MITRE technique ID (e.g. `t1059.001`) when populated |
 | `technique` | string/null | conditional | Optional alias for technique labeling (may mirror `attack_type` on some defense logs) |
 | `stage_number` | string/null | yes | `"0"`–`"15"` for staged attacker actions, else `null` |
@@ -180,7 +180,7 @@ Ground truth is expressed via the `attack_id` field.
 - **Attacker actions:** `attack_id` is non-null, with stage/technique metadata populated where applicable
 - **Attack-linked defense logs:** some observability events include `attack_id`/`stage_number` to indicate linkage to attacker actions
 
-### Kill chain mapping (ATK_50673)
+### Kill chain mapping (ATK_70246)
 
 | Stages | Technique | Description |
 |---|---|---|
@@ -194,8 +194,8 @@ Ground truth is expressed via the `attack_id` field.
 | Identity | Role | Notes |
 |---|---|---|
 | `daniel.davis004` | Sales user | Initial compromise |
-| `sarah.wilson062` | IT user (normal account) | Includes both benign admin work and attack-linked events |
-| `sarah.wilson062_admin` | IT admin account | Attacker actions blend with legitimate admin patterns |
+| `daniel.thomas070` | IT user (normal account) | Includes both benign admin work and attack-linked events |
+| `daniel.thomas070_admin` | IT admin account | Attacker actions blend with legitimate admin patterns |
 
 > **Important:** an attacker can continue using earlier credentials while also operating under a newly obtained privileged account. This is reflected by `attack_id != null` events appearing under multiple accounts during later stages.
 
@@ -218,7 +218,7 @@ Ground truth is expressed via the `attack_id` field.
 
 ### Defense / observability event types
 
-Defense logs often reuse the same `event_type` categories for context, or use control-specific types — e.g. PAM denials, DLP blocks, proxy blocks, SIEM correlations.
+Defense logs often reuse the same `event_type` categories for context, or use control-specific types, e.g. PAM denials, DLP blocks, proxy blocks, SIEM correlations.
 
 ---
 
@@ -291,7 +291,7 @@ Defense logs often reuse the same `event_type` categories for context, or use co
   "command_line": "Get-ScheduledTask | Where-Object {$_.State -eq 'Running'}",
   "source_ip": "10.2.115.23",
   "success": true,
-  "attack_id": "ATK_50673",
+  "attack_id": "ATK_70246",
   "attack_type": "t1059.001",
   "stage_number": "0"
 }
@@ -304,9 +304,9 @@ Defense logs often reuse the same `event_type` categories for context, or use co
   "timestamp": "2025-12-29T23:12:04.000-08:00",
   "log_type": "pam_access_denied",
   "event_type": "admin_action",
-  "hostname": "WS-IT-0063",
-  "account": "sarah.wilson062",
-  "user": "sarah.wilson062",
+  "hostname": "WS-IT-0071",
+  "account": "daniel.thomas070",
+  "user": "daniel.thomas070",
   "source_ip": "10.3.116.100",
   "command_line": "invoke-command -scriptblock {get-date}",
   "severity": "high",
@@ -314,7 +314,7 @@ Defense logs often reuse the same `event_type` categories for context, or use co
   "action_taken": "denied",
   "authentication_type": "Service Account Authentication",
   "target_account": "daniel.davis004",
-  "attack_id": "ATK_50673",
+  "attack_id": "ATK_70246",
   "attack_type": "t1087.002",
   "stage_number": "6"
 }
@@ -326,7 +326,7 @@ Defense logs often reuse the same `event_type` categories for context, or use co
 
 **String / null formatting**
 - Booleans are native JSON booleans (`true` / `false`)
-- Stage numbers are stored as strings (`"0"`, `"1"`, …)
+- Stage numbers are stored as strings (`"0"`, `"1"`, . . .)
 - Null values are JSON `null`; missing optional fields may be absent or `null`
 
 **Defense log behavior**
@@ -349,7 +349,7 @@ Defense logs often reuse the same `event_type` categories for context, or use co
 
 This dataset is designed to surface real detection failure modes:
 
-**Tool overlap.** The attacker uses the same tooling that admins and IT staff use — signatures alone fail.
+**Tool overlap.** The attacker uses the same tooling that admins and IT staff use, signatures alone fail.
 
 **Privilege transitions.** The pivot into IT and IT-admin context is where naive detectors break down.
 
