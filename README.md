@@ -10,8 +10,8 @@ A **realistic enterprise security log dataset** and **reproducible detection ben
 
 - **7,920,291 total logs** over **25 days** of continuous enterprise activity
 - **Multi-user pivot attack campaign** (initial compromise to higher-privilege user to admin account abuse)
-- **500 users** across departments with role-based behavior
-- **55+ service accounts** with authentic high-volume background activity
+- **133 users** across departments with role-based behavior
+- **55 service accounts** with authentic high-volume background activity
 - **Defense observability logs** (EDR / DLP / SIEM / PAM / MFA-style) at SOC volume:
   - **142,184** defense observability events total
   - **342** attacker actions (ground truth)
@@ -264,8 +264,8 @@ Attacker actions are labeled via `attack_id` (non-null), `stage_number` (0–15)
 | Attacker actions (`attack_id` non-null) | 342 (~0.004% of total) |
 | Attack-triggered observability events | 269 (not de-duplicated) |
 | Duration | 25 days |
-| Users | 500 |
-| Service accounts | 55+ |
+| Users | 133 |
+| Service accounts | 55 |
 | Pivot identities | 3 (Sales user to IT user to IT admin) |
 | Hosts touched by attacker | 6 |
 | Attack stages | 16 |
