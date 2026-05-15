@@ -492,6 +492,6 @@ Detection engineers, SOC analysts, cyber range builders, security researchers, a
 - scenario requests
 - examples of where the data does or does not match real SOC telemetry
 
-For private technical feedback, contact: research@phantomarmor.com
+For private technical feedback, contact: gregralr@phantomarmor.com
 
 > All data is fully synthetic. No real users, systems, or organizations are represented.
