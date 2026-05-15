@@ -6,7 +6,11 @@
 
 ## What This Is
 
-A **realistic enterprise security log dataset** and **reproducible detection benchmark** featuring:
+A **realistic enterprise security log dataset** and **reproducible detection benchmark**.
+
+The simulation library currently includes three independent scenarios: living-off-the-land pivot, ransomware double extortion, and fast smash-and-grab lateral movement.
+
+The featured benchmark scenario, SIM-001, includes:
 
 - **7,920,291 total logs** over **25 days** of continuous enterprise activity
 - **Multi-user pivot attack campaign** (initial compromise to higher-privilege user to admin account abuse)
@@ -479,8 +483,15 @@ This is a static, synthetic dataset representing a single high-fidelity campaign
 
 ## Feedback
 
-If you are a detection engineer, security researcher, or ML practitioner and have feedback on the dataset, scoring approach, schema, or realism, please open a GitHub issue or discussion.
+Detection engineers, SOC analysts, cyber range builders, security researchers, and ML practitioners are welcome to open GitHub issues or discussions with:
 
-For private research feedback, you can also contact me at: gregralr@phantomarmor.com
+- realism gaps
+- schema suggestions
+- detection results
+- benchmark feedback
+- scenario requests
+- examples of where the data does or does not match real SOC telemetry
+
+For private technical feedback, contact: research@phantomarmor.com
 
 > All data is fully synthetic. No real users, systems, or organizations are represented.
