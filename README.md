@@ -30,8 +30,8 @@ Built by an ML engineer working in cybersecurity who hit the same wall most team
 - [Scenario at a Glance](#scenario-at-a-glance)
 - [Repository Contents](#repository-contents)
 - [Quick Start](#quick-start)
-- [BigQuery (public) — browse with SQL (no local setup)](#bigquery-public--browse-with-sql-no-local-setup)
 - [Attack Chain](#attack-chain-living_off_land_basic)
+- [Simulation Library](#simulation-library)
 - [Evaluate detections](#evaluate-detections-benchmark)
 - [Why This Attack Is Hard to Detect](#why-this-attack-is-hard-to-detect)
 - [Dataset Statistics](#dataset-statistics)
@@ -155,7 +155,141 @@ with zipfile.ZipFile("data/cyber_simulator_json_format.zip") as zf:
 print("Loaded records:", len(records))
 ```
 
-> **Tip:** For the full dataset, consider streaming into BigQuery / DuckDB / ClickHouse instead of loading all records into memory.
+---
+
+## Simulation Library
+
+This section summarizes all available simulations. Each is a fully independent dataset with its own attack campaign, background noise, and ground truth labels, shareable and reproducible under the same evaluation framework.
+
+---
+
+### SIM-001 · Living-off-the-Land Multi-User Pivot
+
+**Scenario:** Intermediate-skill LOTL campaign — initial Sales user compromise, Kerberoasting-driven credential theft, pivot to IT workstation, privilege escalation to IT admin account, multi-tier server access, and adaptive exfiltration.
+
+| Field | Value |
+|---|---|
+| Attack ID | `ATK_70246` |
+| Total logs | 7,920,291 |
+| Attacker actions | 342 (~0.004%) |
+| Attack stages | 16 (stages 0–15) |
+| Timeline | Dec 21, 2025 – Jan 14, 2026 (25 days) |
+| Pivot identities | 3 — Sales user → IT user → IT admin |
+| Hosts touched | 6 (`WS-SAL-0005`, `WS-IT-0071`, `DC-01`, `DB-SRV-02`, `APP-SRV-02`, `WEB-SRV-01`) |
+| MITRE techniques | T1059.001, T1087.002, T1021.001, T1041 |
+| Auth protocols | Kerberos, NTLM, OAuth 2.0, Certificate |
+| C2 infrastructure | `203.0.113.30` (beacon), `203.0.113.20` (exfil) |
+| Exfil methods | Invoke-RestMethod HTTPS, curl POST, BITSADMIN |
+| Defense observability | 142,184 events (99.8% benign) |
+
+**What makes it hard to detect:** Attacker actions under `daniel.thomas070_admin` co-occur with legitimate IT admin work on the same host. PowerShell, Kerberos ticket requests, and remote admin activity are all normal for IT. Authentication failure-then-success sequences across four protocols are the highest-fidelity signal but individually resemble enterprise noise.
+
+**Download (JSON, split by day):**
+```bash
+curl -L -o data/sim001_cyber_simulator_json_format.zip \
+  https://huggingface.co/datasets/gregalr/cyber_simulation_json_format/resolve/main/cyber_simulator_json_format.zip
+```
+
+---
+
+### SIM-002 · Ransomware Deployment with Double Extortion
+
+**Scenario:** Conti-style ransomware campaign — IT admin account abuse, ADConnect service account credential theft, domain controller access and NTDS/krbtgt hash extraction, pre-encryption data exfiltration (double extortion), wide-network ransomware binary deployment via PsExec across file/backup/database servers, and shadow copy destruction across the environment.
+
+| Field | Value |
+|---|---|
+| Attack ID | `ATK_43219` |
+| Total logs | 8,171,877 |
+| Attacker actions | 559 (~0.007%) |
+| Attack stages | 21 (stages 0–20) |
+| Timeline | Dec 21, 2025 – Jan 14, 2026 (25 days) |
+| Pivot identities | 3 — IT user (`barbara.davis076`) → IT user (`nancy.garcia083`) → IT admin (`nancy.garcia083_admin`) |
+| Service accounts abused | `svc_adconnect`, `svc_database`, `svc_backup`, `svc_fileserver` |
+| Hosts touched | 15 (`WS-IT-0084`, `WS-IT-0077`, `WEB-SRV-01/02`, `FILE-SRV-01/02/03`, `DC-01`, `DB-SRV-01/03`, `APP-SRV-01/02`, `BACKUP-SRV-01/02/03`) |
+| MITRE techniques | T1486 (Data Encrypted for Impact), T1005 (Data from Local System), T1041 (Exfiltration over C2), T1490 (Inhibit System Recovery) |
+| Auth protocols | Kerberos, NTLM, WinRM |
+| C2 infrastructure | `203.0.113.40` (payload delivery / key server), `203.0.113.60` (exfil) |
+| Ransomware binary | `svchost32.exe` — `.conti` extension, timestomped to match system binaries, deployed via PsExec |
+| Exfil payload | `creds_dump.txt`, `krbtgt_hash.txt`, `domain_admins.csv` → compressed to `archive.zip` → BITSADMIN upload |
+| Recovery inhibition | `vssadmin delete shadows`, `wmic shadowcopy delete` across DC-01, FILE-SRV-01/02/03 |
+| Defense observability | Included (same schema) |
+
+**Attack phase summary:**
+
+| Stages | Phase | Key Behaviors |
+|---|---|---|
+| 0–7 | Pre-encryption setup | Defense discovery; ADConnect credential abuse (`ADConnect2024!`); DC-01 access via `svc_adconnect`; privilege escalation attempts; ransomware binary (`svchost32.exe`) download and lateral staging to file/backup/DB servers via PsExec |
+| 8–11 | Data collection | Finance share access via `svc_fileserver`; DB-SRV-01 collection; PowerShell and event log clearing (`wevtutil cl`) |
+| 12–16 | Pre-encryption exfiltration | krbtgt hash + NTDS extraction archive; base64-chunked exfil to `203.0.113.60`; relay via WEB-SRV-01 and APP-SRV-01/02; BITSADMIN upload; artifact cleanup |
+| 17–20 | Recovery inhibition & encryption | Shadow copy enumeration and deletion across file and backup servers; scheduled task–driven encryption (`svchost32.exe --mode encrypt --ext .conti`); PSReadline history wipe |
+
+**What makes it hard to detect:** The attacker operates almost entirely as `nancy.garcia083_admin`, a legitimate IT admin identity. PsExec lateral movement, Kerberos service ticket requests, and remote PowerShell execution are indistinguishable from routine admin activity at the individual event level. The ransomware binary is timestomped to match `svchost.exe`. Shadow copy deletion via `wmic` and `vssadmin` is used by legitimate backup tooling. Detection requires correlating: the ADConnect credential appearing in a lateral session to DC-01, the unusual breadth of PsExec targets, and the pre-encryption exfil sequence — none of which fires a simple signature rule.
+
+**Download (JSON, split by day):**
+```bash
+curl -L -o data/cyber_simulation_json_format_ransomware.zip \
+  https://huggingface.co/datasets/gregalr/cyber_simulation_json_format_ransomware/resolve/main/cyber_simulation_json_format_ransomware.zip
+```
+
+---
+
+### SIM-003 · Smash-and-Grab Lateral Movement
+
+**Scenario:** Fast-tempo Lazarus/APT38-style data theft — Finance user compromise, rapid RDP pivot to IT workstation, IT admin account abuse, SAM hive dump on a domain controller, targeted collection of financial and PII files, and immediate multi-method exfiltration with minimal dwell time.
+
+| Field | Value |
+|---|---|
+| Attack ID | `ATK_54196` |
+| Total logs | 8,189,541 |
+| Attacker actions | 186 (~0.002%) |
+| Attack stages | 9 (stages 0–8) |
+| Timeline | Dec 21, 2025 – Jan 13, 2026 (~24 days) |
+| Pivot identities | 3 — Finance user (`daniel.jones031`) → IT user (`daniel.thomas070`) → IT admin (`daniel.thomas070_admin`) |
+| Service accounts abused | `svc_adconnect`, `svc_database`, `svc_fileserver` |
+| Hosts touched | 8 (`WS-FIN-0032`, `WS-IT-0071`, `FILE-SRV-01/02`, `DC-01`, `DC-02`, `DB-SRV-01`, `DB-SRV-03`) |
+| MITRE techniques | T1021.001 (Remote Services: RDP), T1041 (Exfiltration over C2) |
+| Auth protocols | Kerberos, NTLM |
+| C2 infrastructure | `203.0.113.10` (single endpoint — exfil) |
+| Targeted data | `financials_2024Q1.xlsx`, `customer_PII_extract.csv` |
+| Exfil methods | Invoke-WebRequest HTTPS POST, curl POST, certutil base64 encode |
+| Defense observability | Included (same schema) |
+
+**Attack phase summary:**
+
+| Stages | Phase | Key Behaviors |
+|---|---|---|
+| 0–4 | RDP lateral movement | Finance workstation compromise; RDP probing via `Get-NetTCPConnection`; WMI remote execution on DC-02; SAM hive dump (`reg save HKLM\SAM`); SPN enumeration; `cmdkey` caching of `svc_fileserver` credentials (`F1leSvc2023!`); `mstsc` RDP sessions to FILE-SRV-01, DC-01, DC-02 |
+| 5–8 | Data collection & exfiltration | File share access via `net use`; targeted collection of financial and PII files; `Compress-Archive` to `C:\Temp\archive.zip`; certutil base64 encode; exfil via Invoke-WebRequest and curl POST to `203.0.113.10:443`; archive deletion |
+
+**What makes it hard to detect:** This is the lowest-dwell, lowest-action-count scenario in the library — 186 events across 9 stages versus 342 and 559 in the other two sims. The attacker moves fast and commits to a narrow technique set: RDP and file copy. `mstsc` lateral movement to domain controllers and file servers is routine IT admin behavior. The SAM hive dump (`reg save HKLM\SAM`) is the highest-signal individual action but occurs in a single event. The targeted file collection (`financials_2024Q1.xlsx`, `customer_PII_extract.csv`) is indistinguishable from a legitimate user pulling reports. Certutil base64 encoding before exfil strips most content-inspection signatures. Detectors tuned for long dwell or high event volume will systematically miss this pattern.
+
+**Download (JSON, split by day):**
+```bash
+curl -L -o data/cyber_simulation_json_format_smash_grab.zip \
+  https://huggingface.co/datasets/gregalr/cyber_simulation_json_format_smash_grab/resolve/main/cyber_simulation_json_format_smash_grab.zip
+```
+
+---
+
+### Comparing Simulations
+
+| | SIM-001 · LOTL Pivot | SIM-002 · Ransomware | SIM-003 · Smash & Grab |
+|---|---|---|---|
+| Total logs | 7,920,291 | 8,171,877 | 8,189,541 |
+| Attacker actions | 342 | 559 | 186 |
+| Stages | 16 | 21 | 9 |
+| Hosts touched | 6 | 15 | 8 |
+| Pivot identities | 3 | 3 | 3 |
+| Service accounts abused | 2 | 4 | 3 |
+| MITRE techniques | 4 | 4 | 2 |
+| Attack tempo | Slow (dwell + adapt) | Slow (dwell + destruct) | Fast (smash & grab) |
+| Destructive payload | No | Yes (encrypt + shadow delete) | No |
+| Double extortion | No | Yes | No |
+| NTDS / krbtgt extraction | No | Yes | No |
+| SAM hive dump | No | No | Yes |
+| Targeted file collection | No | No | Yes (financials, PII) |
+| Artifact cleanup | Yes | Yes | Yes |
+| Defense observability stream | Yes (142K events) | Yes | Yes |
 
 ---
 
@@ -342,5 +476,11 @@ This is a static, synthetic dataset representing a single high-fidelity campaign
 - Research on alert noise, privilege transitions, and pivot detection
 
 ---
+
+## Feedback
+
+If you are a detection engineer, security researcher, or ML practitioner and have feedback on the dataset, scoring approach, schema, or realism, please open a GitHub issue or discussion.
+
+For private research feedback, you can also contact me at: gregralr.@phantomarmor.com
 
 > All data is fully synthetic. No real users, systems, or organizations are represented.
