@@ -481,6 +481,6 @@ This is a static, synthetic dataset representing a single high-fidelity campaign
 
 If you are a detection engineer, security researcher, or ML practitioner and have feedback on the dataset, scoring approach, schema, or realism, please open a GitHub issue or discussion.
 
-For private research feedback, you can also contact me at: gregralr.@phantomarmor.com
+For private research feedback, you can also contact me at: gregralr@phantomarmor.com
 
 > All data is fully synthetic. No real users, systems, or organizations are represented.
